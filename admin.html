@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayosa Admin Panel - Complete Management System</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Configuration  
+        const SUPABASE_URL = 'https://quwkatpuuzhyfxsrmxxi.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1d2thdHB1dXpoeWZ4c3JteHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNTM0NTUsImV4cCI6MjA3MjcyOTQ1NX0.4nf8GvrLRWksHMBNnBk828S-r3h0xlgLRI0ZIvtGUus'
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        console.log('Admin Panel - Supabase connected!')
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .admin-logo { display: flex; align-items: center; gap: 10px; }
+        .admin-logo h1 { color: #333; font-size: 1.8rem; font-weight: bold; }
+
+        .admin-actions { display: flex; gap: 1rem; align-items: center; }
+
+        .btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { transform: scale(1.05); }
+        .btn-danger { background: #e74c3c; }
+        .btn-warning { background: #f39c12; }
+        .btn-info { background: #3498db; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        .admin-dashboard {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number { font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .tab-btn.active { background: #f39c12; color: white; }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-content.active { display: block; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label { font-weight: bold; color: #333; }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #f39c12;
+            outline: none;
+            box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-right: 0.5rem;
+        }
+
+        .edit-btn { background: #3498db; color: white; }
+        .delete-btn { background: #e74c3c; color: white; }
+        .view-btn { background: #27ae60; color: white; }
+
+        .action-btn:hover { transform: scale(1.05); }
+
+        .success-message, .error-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending { background: #f39c12; color: white; }
+        .status-confirmed { background: #3498db; color: white; }
+        .status-shipped { background: #9b59b6; color: white; }
+        .status-delivered { background: #27ae60; color: white; }
+        .status-cancelled { background: #e74c3c; color: white; }
+
+        @media (max-width: 768px) {
+            .admin-tabs { flex-direction: column; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid { grid-template-columns: 1fr; }
+            .admin-nav { flex-direction: column; gap: 1rem; }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #f39c12;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <span style="font-size: 2rem;">⚙️</span>
+                <h1>Bayosa Admin Panel</h1>
+            </div>
+            <div class="admin-actions">
+                <a href="index.html" class="btn">🏠 Home Page</a>
+                <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="admin-dashboard">
+            <h2>📊 Dashboard Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalProducts">0</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalOrders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingOrders">0</div>
+                    <div class="stat-label">Pending Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRevenue">₹0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="showTab('products')">📦 Products</button>
+            <button class="tab-btn" onclick="showTab('orders')">📋 Orders</button>
+            <button class="tab-btn" onclick="showTab('add-product')">➕ Add Product</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Products Tab -->
+        <div class="tab-content active" id="products">
+            <h3>📦 Product Management</h3>
+            
+            <div class="success-message" id="productMessage"></div>
+            <div class="error-message" id="productError"></div>
+
+            <button class="btn" onclick="loadProducts()">🔄 Refresh Products</button>
+            
+            <div class="loading" id="productsLoading">
+                <div class="spinner"></div>
+                <p>Loading products...</p>
+            </div>
+
+            <table class="data-table" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Sizes</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <!-- Products will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Orders Tab -->
+        <div class="tab-content" id="orders">
+            <h3>📋 Orders Management</h3>
+            
+            <div class="success-message" id="orderMessage"></div>
+            
+            <button class="btn" onclick="loadOrders()">🔄 Refresh Orders</button>
+
+            <div class="loading" id="ordersLoading">
+                <div class="spinner"></div>
+                <p>Loading orders...</p>
+            </div>
+
+            <table class="data-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Orders will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Product Tab -->
+        <div class="tab-content" id="add-product">
+            <h3>➕ Add New Product</h3>
+            
+            <div class="success-message" id="addProductMessage"></div>
+            <div class="error-message" id="addProductError"></div>
+
+            <form class="form-grid" onsubmit="addNewProduct(event)">
+                <div class="form-group">
+                    <label class="form-label">Product Name *</label>
+                    <input type="text" class="form-input" id="productName" placeholder="e.g., Nike Air Max 270" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-select" id="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="mens">Men's Shoes</option>
+                        <option value="womens">Women's Shoes</option>
+                        <option value="kids">Kids' Shoes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type *</label>
+                    <select class="form-select" id="productType" required>
+                        <option value="">Select Type</option>
+                        <option value="formal">Formal</option>
+                        <option value="sports">Sports</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Brand *</label>
+                    <input type="text" class="form-input" id="productBrand" placeholder="e.g., Nike" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Color *</label>
+                    <input type="text" class="form-input" id="productColor" placeholder="e.g., Black" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Current Price (₹) *</label>
+                    <input type="number" class="form-input" id="productPrice" placeholder="1999" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Original Price (₹)</label>
+                    <input type="number" class="form-input" id="originalPrice" placeholder="2499">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Available Sizes * (comma separated)</label>
+                    <input type="text" class="form-input" id="productSizes" placeholder="6,7,8,9,10" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Image (emoji or URL)</label>
+                    <input type="text" class="form-input" id="productImage" placeholder="👟 or image URL">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Badge</label>
+                    <select class="form-select" id="productBadge">
+                        <option value="">No Badge</option>
+                        <option value="NEW">NEW</option>
+                        <option value="BESTSELLER">BESTSELLER</option>
+                        <option value="SALE">SALE</option>
+                        <option value="HOT">HOT</option>
+                        <option value="TRENDING">TRENDING</option>
+                        <option value="PREMIUM">PREMIUM</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn" style="grid-column: 1 / -1; padding: 1rem 2rem; font-size: 1.1rem;">
+                    ➕ Add Product
+                </button>
+            </form>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <h3>⚙️ Settings</h3>
+            <div style="background: #f8f9fa; padding: 2rem; border-radius: 10px;">
+                <h4>🏪 Store Information</h4>
+                <p><strong>Store Name:</strong> Bayosa Footwear</p>
+                <p><strong>Address:</strong> सिवेरा रोड, झाडोली</p>
+                <p><strong>Phone:</strong> +91-90795-69517</p>
+                <p><strong>WhatsApp:</strong> +91-90795-69517</p>
+                <p><strong>Store Hours:</strong> 9:00 AM - 9:00 PM (7 days)</p>
+                <br>
+                <h4>💾 Database Information</h4>
+                <p><strong>Database:</strong> Supabase</p>
+                <p><strong>Status:</strong> <span style="color: #27ae60;">Connected ✅</span></p>
+                <p><strong>Tables:</strong> products, orders</p>
+                <br>
+                <button class="btn btn-info" onclick="testConnection()">🔗 Test Database Connection</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Admin Data Manager Class
+        class AdminDataManager {
+            
+            // Products get करना
+            async getProducts() {
+                try {
+                    const { data, error } = await supabase
+                        .from('products')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                    
+                    if (error) throw error
+                    return data
+                } catch (error) {
+                    console.error('Error fetching products:', error)
+                    return []
+                }
+            }
+            
+            // Product add करना
+            async addProduct(productData) {
+                try {
+                    const { data, error } = await supabase
+                        .from('products')
+                        .insert([{
+                            name: productData.name,
+                            category: productData.category,
+                            type: productData.type,
+                            brand: productData.brand,
+                            color: productData.color,
+                            price: productData.price,
+                            original_price: productData.originalPrice,
+                            discount: productData.discount || 0,
+                            sizes: productData.sizes,
+                            image: productData.image,
+                            badge: productData.badge
+                        }])
+                        .select()
+                    
+                    if (error) throw error
+                    return data[0]
+                } catch (error) {
+                    console.error('Error adding product:', error)
+                    return null
+                }
+            }
+            
+            // Product delete करना
+            async deleteProduct(productId) {
+                try {
+                    const { error } = await supabase
+                        .from('products')
+                        .update({ is_active: false })
+                        .eq('id', productId)
+                    
+                    if (error) throw error
+                    return true
+                } catch (error) {
+                    console.error('Error deleting product:', error)
+                    return false
+                }
+            }
+            
+            // Orders get करना
+            async getOrders() {
+                try {
+                    const { data, error } = await supabase
+                        .from('orders')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                    
+                    if (error) throw error
+                    return data
+                } catch (error) {
+                    console.error('Error fetching orders:', error)
+                    return []
+                }
+            }
+            
+            // Order status update करना
+            async updateOrderStatus(orderId, status) {
+                try {
+                    const { data, error } = await supabase
+                        .from('orders')
+                        .update({ status: status })
+                        .eq('id', orderId)
+                        .select()
+                    
+                    if (error) throw error
+                    return data[0]
+                } catch (error) {
+                    console.error('Error updating order:', error)
+                    return null
+                }
+            }
+            
+            // Statistics get करना
+            async getStats() {
+                try {
+                    const [productsResult, ordersResult] = await Promise.all([
+                        supabase.from('products').select('category', { count: 'exact' }).eq('is_active', true),
+                        supabase.from('orders').select('status, total_amount', { count: 'exact' })
+                    ])
+                    
+                    const products = productsResult.data || []
+                    const orders = ordersResult.data || []
+                    
+                    return {
+                        totalProducts: productsResult.count || 0,
+                        totalOrders: ordersResult.count || 0,
+                        pendingOrders: orders.filter(o => o.status === 'pending').length,
+                        totalRevenue: orders
+                            .filter(o => o.status === 'delivered')
+                            .reduce((sum, o) => sum + o.total_amount, 0),
+                        categories: {
+                            mens: products.filter(p => p.category === 'mens').length,
+                            womens: products.filter(p => p.category === 'womens').length,
+                            kids: products.filter(p => p.category === 'kids').length
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching stats:', error)
+                    return {
+                        totalProducts: 0,
+                        totalOrders: 0,
+                        pendingOrders: 0,
+                        totalRevenue: 0,
+                        categories: { mens: 0, womens: 0, kids: 0 }
+                    }
+                }
+            }
+        }
+        
+        // Global variables
+        let products = [];
+        let orders = [];
+        window.adminData = new AdminDataManager()
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            loadProducts();
+        });
+
+        // Tab functionality
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabId === 'orders') {
+                loadOrders();
+            }
+        }
+
+        // Update dashboard stats
+        async function updateStats() {
+            try {
+                const stats = await window.adminData.getStats();
+                
+                document.getElementById('totalProducts').textContent = stats.totalProducts;
+                document.getElementById('totalOrders').textContent = stats.totalOrders;
+                document.getElementById('pendingOrders').textContent = stats.pendingOrders;
+                document.getElementById('totalRevenue').textContent = `₹${stats.totalRevenue}`;
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // Load products
+        async function loadProducts() {
+            const loading = document.getElementById('productsLoading');
+            const tableBody = document.getElementById('productsTableBody');
+            
+            loading.style.display = 'block';
+            
+            try {
+                products = await window.adminData.getProducts();
+                
+                if (products.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No products found</td></tr>';
+                } else {
+                    tableBody.innerHTML = products.map(product => `
+                        <tr>
+                            <td>
+                                <div style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 8px; font-size: 1.5rem;">
+                                    ${product.image || '👟'}
+                                </div>
+                            </td>
+                            <td>${product.name}</td>
+                            <td>${getCategoryName(product.category)} - ${getTypeName(product.type)}</td>
+                            <td>₹${product.price} ${product.discount > 0 ? `<small style="color: #27ae60;">(${product.discount}% OFF)</small>` : ''}</td>
+                            <td>${product.sizes.join(', ')}</td>
+                            <td>
+                                <span class="status-badge ${product.is_active ? 'status-delivered' : 'status-cancelled'}">
+                                    ${product.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="action-btn delete-btn" onclick="deleteProduct(${product.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showError('productError', 'Failed to load products');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            const loading = document.getElementById('ordersLoading');
+            const tableBody = document.getElementById('ordersTableBody');
+            
+            loading.style.display = 'block';
+            
+            try {
+                orders = await window.adminData.getOrders();
+                
+                if (orders.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No orders found</td></tr>';
+                } else {
+                    tableBody.innerHTML = orders.map(order => `
+                        <tr>
+                            <td>#${order.id}</td>
+                            <td>${order.customer_name}</td>
+                            <td>${order.phone}</td>
+                            <td>₹${order.total_amount}</td>
+                            <td>
+                                <select onchange="updateOrderStatus(${order.id}, this.value)" class="form-select" style="padding: 0.3rem;">
+                                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                                    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </td>
+                            <td>${new Date(order.created_at).toLocaleDateString('hi-IN')}</td>
+                            <td>
+                                <button class="action-btn view-btn" onclick="viewOrderDetails(${order.id})">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showError('orderMessage', 'Failed to load orders');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Add new product
+        async function addNewProduct(event) {
+            event.preventDefault();
+            
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Adding...';
+            submitBtn.disabled = true;
+            
+            try {
+                const sizes = document.getElementById('productSizes').value
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(s => s);
+                
+                if (sizes.length === 0) {
+                    throw new Error('Please provide at least one size');
+                }
+                
+                const originalPrice = parseInt(document.getElementById('originalPrice').value);
+                const currentPrice = parseInt(document.getElementById('productPrice').value);
+                const discount = originalPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
+                
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    category: document.getElementById('productCategory').value,
+                    type: document.getElementById('productType').value,
+                    brand: document.getElementById('productBrand').value,
+                    color: document.getElementById('productColor').value,
+                    price: currentPrice,
+                    originalPrice: originalPrice || currentPrice,
+                    discount: discount,
+                    sizes: sizes,
+                    image: document.getElementById('productImage').value || '👟',
+                    badge: document.getElementById('productBadge').value || 'NEW'
+                };
+                
+                const newProduct = await window.adminData.addProduct(productData);
+                
+                if (newProduct) {
+                    showSuccess('addProductMessage', 'Product successfully added!');
+                    event.target.reset();
+                    loadProducts();
+                    updateStats();
+                } else {
+                    throw new Error('Failed to add product');
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+                showError('addProductError', error.message || 'Failed to add product');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Delete product
+        async function deleteProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product && confirm(`Are you sure you want to delete "${product.name}"?`)) {
+                try {
+                    const success = await window.adminData.deleteProduct(productId);
+                    if (success) {
+                        showSuccess('productMessage', 'Product deleted successfully!');
+                        loadProducts();
+                        updateStats();
+                    } else {
+                        throw new Error('Failed to delete product');
+                    }
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                    showError('productError', 'Failed to delete product');
+                }
+            }
+        }
+
+        // Update order status
+        async function updateOrderStatus(orderId, newStatus) {
+            try {
+                const updatedOrder = await window.adminData.updateOrderStatus(orderId, newStatus);
+                if (updatedOrder) {
+                    showSuccess('orderMessage', `Order #${orderId} status updated to ${newStatus}`);
+                    updateStats();
+                } else {
+                    throw new Error('Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Error updating order:', error);
+                showError('orderMessage', 'Failed to update order status');
+            }
+        }
+
+        // View order details
+        function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                const itemsList = order.items.map(item => 
+                    `• ${item.productName} (Size: ${item.selectedSize}) x${item.quantity} - ₹${item.price * item.quantity}`
+                ).join('\n');
+                
+                alert(`Order Details:
+
+Order ID: #${order.id}
+Customer: ${order.customer_name}
+Phone: ${order.phone}
+Status: ${order.status}
+Total: ₹${order.total_amount}
+Date: ${new Date(order.created_at).toLocaleString('hi-IN')}
+
+Items:
+${itemsList}
+
+${order.notes ? 'Notes: ' + order.notes : ''}`);
+            }
+        }
+
+        // Test database connection
+        async function testConnection() {
+            try {
+                const stats = await window.adminData.getStats();
+                alert('✅ Database connection successful!\n\nStats:\n- Products: ' + stats.totalProducts + '\n- Orders: ' + stats.totalOrders);
+            } catch (error) {
+                alert('❌ Database connection failed!\n\nError: ' + error.message);
+            }
+        }
+
+        // Utility functions
+        function getCategoryName(category) {
+            const names = {
+                'mens': 'Men\'s',
+                'womens': 'Women\'s',
+                'kids': 'Kids\''
+            };
+            return names[category] || category;
+        }
+
+        function getTypeName(type) {
+            const names = {
+                'formal': 'Formal',
+                'sports': 'Sports',
+                'casual': 'Casual'
+            };
+            return names[type] || type;
+        }
+
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
