@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पुरुषों के जूते - Bayosa Footwear</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://quwkatpuuzhyfxsrmxxi.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1d2thdHB1dXpoeWZ4c3JteHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNTM0NTUsImV4cCI6MjA3MjcyOTQ1NX0.4nf8GvrLRWksHMBNnBk828S-r3h0xlgLRI0ZIvtGUus'
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        class MensDataManager {
+            async getProducts(filters = {}) {
+                try {
+                    let query = supabase
+                        .from('products')
+                        .select('*')
+                        .eq('is_active', true)
+                        .eq('category', 'mens')
+                        .order('created_at', { ascending: false })
+                    
+                    if (filters.type) query = query.eq('type', filters.type)
+                    if (filters.brand) query = query.eq('brand', filters.brand)
+                    if (filters.color) query = query.eq('color', filters.color)
+                    if (filters.minPrice) query = query.gte('price', filters.minPrice)
+                    if (filters.maxPrice) query = query.lte('price', filters.maxPrice)
+                    
+                    const { data, error } = await query
+                    
+                    if (error) {
+                        console.error('Error fetching products:', error)
+                        return []
+                    }
+                    
+                    return data || []
+                } catch (err) {
+                    console.error('Network error:', err)
+                    return []
+                }
+            }
+        }
+        
+        window.mensDataManager = new MensDataManager()
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #e74c3c;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .filter-select, .price-input {
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .price-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .price-input {
+            width: 100px;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .apply-filters, .clear-filters {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .apply-filters {
+            background: #27ae60;
+            color: white;
+        }
+
+        .clear-filters {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #888;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .product-image .fallback-icon {
+            font-size: 4rem;
+            color: #888;
+            opacity: 0.7;
+        }
+
+        .product-image .image-error {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-category {
+            color: #2c3e50;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background: #27ae60;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .product-sizes {
+            margin-bottom: 1rem;
+        }
+
+        .sizes-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .size-btn:hover, .size-btn.selected {
+            border-color: #2c3e50;
+            background: #2c3e50;
+            color: white;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart, .quick-order {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .quick-order {
+            background: #25D366;
+            color: white;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Debug info styles */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            z-index: 9999;
+            display: none;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .product-summary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel, .btn-submit {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-submit {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-submit:hover {
+            background: #128C7E;
+        }
+
+        @media (max-width: 768px) {
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: auto;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .navbar {
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            
+            .nav-item {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+            }
+
+            .product-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: 2% auto;
+                padding: 1.5rem;
+                width: 95%;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info" id="debugInfo"></div>
+
+    <!-- Quick Order Modal -->
+    <div id="quickOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Quick Order Details</h3>
+                <button class="close-btn" onclick="closeQuickOrderModal()">&times;</button>
+            </div>
+            
+            <div class="product-summary" id="productSummary">
+                <!-- Product details will be inserted here -->
+            </div>
+            
+            <form id="quickOrderForm">
+                <div class="form-group">
+                    <label class="form-label" for="customerName">आपका नाम <span class="required">*</span></label>
+                    <input type="text" id="customerName" class="form-input" placeholder="अपना पूरा नाम लिखें" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">फोन नंबर <span class="required">*</span></label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="10 अंकों का फोन नंबर" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerAddress">पूरा पता <span class="required">*</span></label>
+                    <textarea id="customerAddress" class="form-textarea" placeholder="घर का नंबर, गली, शहर, राज्य, पिन कोड" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerMessage">अतिरिक्त जानकारी (वैकल्पिक)</label>
+                    <textarea id="customerMessage" class="form-textarea" placeholder="कोई विशेष आवश्यकता या message"></textarea>
+                </div>
+            </form>
+            
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeQuickOrderModal()">Cancel</button>
+                <button type="button" class="btn-submit" onclick="submitQuickOrder()">WhatsApp पर Order करें</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <span class="logo-icon">👞</span>
+                    <h1>Bayosa Footwear</h1>
+                </div>
+                <div class="header-actions">
+                    <div>📍 सिवेरा रोड, झाडोली</div>
+                    <div>📞 +91-90795-69517</div>
+                    <button class="cart-btn" onclick="openCart()">
+                        🛒 Cart
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="navbar">
+                <a href="index.html" class="nav-item">सभी उत्पाद</a>
+                <a href="mens-shoes.html" class="nav-item active">पुरुषों के जूते</a>
+                <a href="womens-shoes.html" class="nav-item">महिलाओं के जूते</a>
+                <a href="kids-shoes.html" class="nav-item">बच्चों के जूते</a>
+                <a href="formal-shoes.html" class="nav-item">फॉर्मल</a>
+                <a href="sports-shoes.html" class="nav-item">स्पोर्ट्स</a>
+                <a href="casual-shoes.html" class="nav-item">कैजुअल</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="hero">
+                <h2>👨 पुरुषों के जूते</h2>
+                <p>स्टाइल और कम्फर्ट का परफेक्ट कॉम्बिनेशन</p>
+            </section>
+
+            <section class="filters-section">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select class="filter-select" id="typeFilter">
+                            <option value="">सभी Types</option>
+                            <option value="formal">फॉर्मल</option>
+                            <option value="sports">स्पोर्ट्स</option>
+                            <option value="casual">कैजुअल</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">ब्रांड</label>
+                        <select class="filter-select" id="brandFilter">
+                            <option value="">सभी ब्रांड</option>
+                            <option value="nike">Nike</option>
+                            <option value="adidas">Adidas</option>
+                            <option value="puma">Puma</option>
+                            <option value="bata">Bata</option>
+                            <option value="liberty">Liberty</option>
+                            <option value="action">Action</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">रंग</label>
+                        <select class="filter-select" id="colorFilter">
+                            <option value="">सभी रंग</option>
+                            <option value="black">काला</option>
+                            <option value="brown">भूरा</option>
+                            <option value="white">सफेद</option>
+                            <option value="blue">नीला</option>
+                            <option value="red">लाल</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">साइज़</label>
+                        <select class="filter-select" id="sizeFilter">
+                            <option value="">सभी साइज़</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">कीमत</label>
+                        <div class="price-range">
+                            <input type="number" class="price-input" id="minPrice" placeholder="Min ₹">
+                            <span>-</span>
+                            <input type="number" class="price-input" id="maxPrice" placeholder="Max ₹">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="apply-filters" onclick="applyFilters()">🔍 Filter Apply करें</button>
+                    <button class="clear-filters" onclick="clearFilters()">🗑️ Clear करें</button>
+                </div>
+            </section>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Products लोड हो रहे हैं...</p>
+            </div>
+
+            <section class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
+            </section>
+
+            <div class="no-products" id="noProducts" style="display: none;">
+                <h3>😔 कोई पुरुषों के जूते नहीं मिले</h3>
+                <p>कृपया अलग filters try करें</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let products = [];
+        let cart = [];
+        let filteredProducts = [];
+        let currentOrderProduct = null;
+        let currentOrderSize = null;
+        const phoneNumber = "919079569517";
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadProducts();
+            loadCart();
+            updateCartCount();
+        });
+
+        async function loadProducts() {
+            showLoading();
+            try {
+                products = await window.mensDataManager.getProducts();
+                filteredProducts = [...products];
+                displayProducts(products);
+                
+                // Debug logging
+                console.log('Loaded products:', products.length);
+                updateDebugInfo(`Loaded ${products.length} products`);
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('noProducts').style.display = 'block';
+                updateDebugInfo(`Error: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function loadCart() {
+            const savedCart = localStorage.getItem('bayosa_cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+        }
+
+        async function applyFilters() {
+            showLoading();
+            
+            const filters = {
+                type: document.getElementById('typeFilter').value,
+                brand: document.getElementById('brandFilter').value,
+                color: document.getElementById('colorFilter').value,
+                minPrice: parseInt(document.getElementById('minPrice').value) || null,
+                maxPrice: parseInt(document.getElementById('maxPrice').value) || null
+            };
+
+            Object.keys(filters).forEach(key => {
+                if (!filters[key]) delete filters[key];
+            });
+
+            try {
+                filteredProducts = await window.mensDataManager.getProducts(filters);
+                
+                const size = document.getElementById('sizeFilter').value;
+                if (size) {
+                    filteredProducts = filteredProducts.filter(product => 
+                        product.sizes && product.sizes.includes(size)
+                    );
+                }
+                
+                displayProducts(filteredProducts);
+                updateDebugInfo(`Filtered: ${filteredProducts.length} products`);
+                
+            } catch (error) {
+                console.error('Error applying filters:', error);
+                updateDebugInfo(`Filter error: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('brandFilter').value = '';
+            document.getElementById('colorFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            
+            loadProducts();
+        }
+
+        // Fixed function for rendering product image
+        function renderProductImage(product) {
+            if (product.image && product.image.trim() !== '') {
+                console.log('Rendering image for product:', product.name, 'Image URL:', product.image);
+                return `
+                    <img src="${product.image}" 
+                         alt="${product.name}" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('Image failed to load:', '${product.image}');"
+                         onload="this.style.opacity='1'; console.log('Image loaded successfully:', '${product.image}');"
+                         style="opacity: 0; transition: opacity 0.3s;">
+                    <div class="fallback-icon" style="display: none;">👟</div>
+                `;
+            } else {
+                console.log('No image URL for product:', product.name);
+                return `<div class="fallback-icon">👟</div>`;
+            }
+        }
+
+        function displayProducts(productsToShow) {
+            const productsGrid = document.getElementById('productsGrid');
+            const noProducts = document.getElementById('noProducts');
+            
+            console.log('Displaying products:', productsToShow.length);
+            
+            if (productsToShow.length === 0) {
+                productsGrid.innerHTML = '';
+                noProducts.style.display = 'block';
+                return;
+            }
+            
+            noProducts.style.display = 'none';
+            
+            productsGrid.innerHTML = productsToShow.map(product => {
+                console.log('Product data:', {
+                    name: product.name,
+                    image: product.image,
+                    sizes: product.sizes
+                });
+                
+                return `
+                <div class="product-card" data-product-id="${product.id}">
+                    <div class="product-badge">${product.badge || 'NEW'}</div>
+                    <div class="product-image">
+                        ${renderProductImage(product)}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">पुरुष - ${getTypeName(product.type)}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">
+                            <span class="current-price">₹${product.price}</span>
+                            ${product.discount > 0 ? `
+                                <span class="original-price">₹${product.original_price}</span>
+                                <span class="discount">${product.discount}% OFF</span>
+                            ` : ''}
+                        </div>
+                        <div class="product-sizes">
+                            <span class="sizes-label">उपलब्ध साइज़:</span>
+                            <div class="size-options">
+                                ${(product.sizes || []).map(size => `
+                                    <button class="size-btn" onclick="selectSize(this, '${product.id}', '${size}')">${size}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" onclick="addToCart(${product.id})">
+                                🛒 Cart में Add करें
+                            </button>
+                            <button class="quick-order" onclick="quickOrderWhatsApp(${product.id})">
+                                📱 Quick Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function getTypeName(type) {
+            const names = {
+                'formal': 'फॉर्मल',
+                'sports': 'स्पोर्ट्स',
+                'casual': 'कैजुअल'
+            };
+            return names[type] || type;
+        }
+
+        function selectSize(button, productId, size) {
+            const productCard = button.closest('.product-card');
+            productCard.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            const selectedSize = selectedSizeBtn.textContent;
+            
+            const existingItem = cart.find(item => 
+                item.id === productId && item.selectedSize === selectedSize
+            );
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    selectedSize: selectedSize,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            localStorage.setItem('bayosa_cart', JSON.stringify(cart));
+            
+            const button = productCard.querySelector('.add-to-cart');
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Added!';
+            button.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#2c3e50';
+            }, 2000);
+        }
+
+        // Enhanced Quick Order Function
+        function quickOrderWhatsApp(productId) {
+            const product = products.find(p => p.id === productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            currentOrderProduct = product;
+            currentOrderSize = selectedSizeBtn.textContent;
+            
+            // Update product summary in modal
+            const productSummary = document.getElementById('productSummary');
+            productSummary.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="font-size: 2rem;">👟</div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1rem;">${product.name}</div>
+                        <div style="color: #666;">Size: ${currentOrderSize}</div>
+                        <div style="color: #e74c3c; font-weight: bold; font-size: 1.2rem;">₹${product.price}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Clear form
+            document.getElementById('quickOrderForm').reset();
+            
+            // Show modal
+            document.getElementById('quickOrderModal').style.display = 'block';
+            
+            // Focus on first input
+            setTimeout(() => {
+                document.getElementById('customerName').focus();
+            }, 100);
+        }
+
+        function closeQuickOrderModal() {
+            document.getElementById('quickOrderModal').style.display = 'none';
+            currentOrderProduct = null;
+            currentOrderSize = null;
+        }
+
+        function submitQuickOrder() {
+            // Get form values
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+            const message = document.getElementById('customerMessage').value.trim();
+            
+            // Validation
+            if (!name) {
+                alert('कृपया अपना नाम डालें!');
+                document.getElementById('customerName').focus();
+                return;
+            }
+            
+            if (!phone) {
+                alert('कृपया फोन नंबर डालें!');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
+            
+            if (phone.length < 10) {
+                alert('कृपया सही फोन नंबर डालें!');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
+            
+            if (!address) {
+                alert('कृपया अपना पूरा पता डालें!');
+                document.getElementById('customerAddress').focus();
+                return;
+            }
+            
+            // Create WhatsApp message
+            let whatsappMessage = `🛍️ *QUICK ORDER - Bayosa Footwear*\n\n`;
+            whatsappMessage += `*Product:* ${currentOrderProduct.name}\n`;
+            whatsappMessage += `*Price:* ₹${currentOrderProduct.price}\n`;
+            whatsappMessage += `*Size:* ${currentOrderSize}\n\n`;
+            whatsappMessage += `*Customer Details:*\n`;
+            whatsappMessage += `📝 *Name:* ${name}\n`;
+            whatsappMessage += `📞 *Phone:* ${phone}\n`;
+            whatsappMessage += `📍 *Address:* ${address}\n`;
+            
+            if (message) {
+                whatsappMessage += `💬 *Message:* ${message}\n`;
+            }
+            
+            whatsappMessage += `\n🙏 कृपया availability confirm करें। धन्यवाद!`;
+            
+            // Open WhatsApp
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappURL, '_blank');
+            
+            // Close modal
+            closeQuickOrderModal();
+            
+            // Show success message
+            setTimeout(() => {
+                alert('आपका order WhatsApp पर भेज दिया गया है! जल्द ही आपसे संपर्क किया जाएगा।');
+            }, 500);
+        }
+
+        function openCart() {
+            alert('Cart feature main website (index.html) पर उपलब्ध है');
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('productsGrid').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('productsGrid').style.opacity = '1';
+        }
+
+        // Debug functions
+        function updateDebugInfo(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.textContent = message;
+            debugInfo.style.display = 'block';
+            setTimeout(() => {
+                debugInfo.style.display = 'none';
+            }, 5000);
+        }
+
+        function debugImageLoading() {
+            console.log('=== DEBUG: Image Loading Analysis ===');
+            console.log('Current products:', products.length);
+            
+            products.forEach((product, index) => {
+                console.log(`Product ${index + 1}:`, {
+                    name: product.name,
+                    image: product.image,
+                    hasImage: !!(product.image && product.image.trim()),
+                    imageLength: product.image ? product.image.length : 0
+                });
+                
+                if (product.image) {
+                    // Test if image URL is accessible
+                    const img = new Image();
+                    img.onload = () => console.log(`✅ Image loads: ${product.name}`);
+                    img.onerror = () => console.log(`❌ Image fails: ${product.name} - ${product.image}`);
+                    img.src = product.image;
+                }
+            });
+        }
+
+        // Modal event handlers
+        window.onclick = function(event) {
+            const modal = document.getElementById('quickOrderModal');
+            if (event.target === modal) {
+                closeQuickOrderModal();
+            }
+        }
+
+        // Handle Enter key in form
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('quickOrderForm');
+            if (form) {
+                form.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        submitQuickOrder();
+                    }
+                });
+            }
+        });
+
+        // Auto-debug after loading
+        setTimeout(() => {
+            debugImageLoading();
+        }, 3000);
+
+        // Test function for manual debugging
+        window.testImageLoading = debugImageLoading;
+        
+        console.log('🔍 Debug tools available: call testImageLoading() in console');
+    </script>
+</body>
+</html>
