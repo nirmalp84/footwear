@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>स्पोर्ट्स जूते - Bayosa Footwear</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://quwkatpuuzhyfxsrmxxi.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1d2thdHB1dXpoeWZ4c3JteHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNTM0NTUsImV4cCI6MjA3MjcyOTQ1NX0.4nf8GvrLRWksHMBNnBk828S-r3h0xlgLRI0ZIvtGUus'
+        
+        // Initialize Supabase
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase connected successfully!');
+        } catch (error) {
+            console.error('Supabase connection error:', error);
+        }
+        
+        class SportsDataManager {
+            async getProducts(filters = {}) {
+                try {
+                    if (!supabase) {
+                        throw new Error('Supabase not initialized');
+                    }
+                    
+                    let query = supabase
+                        .from('products')
+                        .select('*')
+                        .eq('is_active', true)
+                        .eq('type', 'sports')
+                        .order('created_at', { ascending: false })
+                    
+                    if (filters.category) query = query.eq('category', filters.category)
+                    if (filters.brand) query = query.eq('brand', filters.brand)
+                    if (filters.color) query = query.eq('color', filters.color)
+                    if (filters.minPrice) query = query.gte('price', filters.minPrice)
+                    if (filters.maxPrice) query = query.lte('price', filters.maxPrice)
+                    
+                    const { data, error } = await query
+                    
+                    if (error) {
+                        console.error('Error fetching products:', error)
+                        return []
+                    }
+                    
+                    return data || []
+                } catch (err) {
+                    console.error('Network error:', err)
+                    return []
+                }
+            }
+        }
+        
+        window.sportsDataManager = new SportsDataManager()
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff7f00 0%, #ff4500 100%);
+            min-height: 100vh;
+            /* Fixed mobile layout issue */
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .header.hide {
+            transform: translateY(-100%);
+        }
+
+        /* Enhanced mobile header height calculation */
+        .main-content {
+            margin-top: 140px; /* Increased for better mobile visibility */
+            padding-top: 10px; /* Additional padding for content visibility */
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .cart-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #e74c3c;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+        }
+
+        .navbar::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .navbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .navbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 127, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .navbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 127, 0, 0.8);
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: #ff7f00;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        /* Enhanced delivery info with location details */
+        .delivery-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            text-align: center;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .delivery-main {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .delivery-locations {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            display: block;
+            color: #ecf0f1;
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .filter-select, .price-input {
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus, .price-input:focus {
+            border-color: #ff7f00;
+            outline: none;
+        }
+
+        .price-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .price-input {
+            width: 100px;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .apply-filters, .clear-filters {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .apply-filters {
+            background: #27ae60;
+            color: white;
+        }
+
+        .apply-filters:hover {
+            background: #229954;
+        }
+
+        .clear-filters {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .clear-filters:hover {
+            background: #7f8c8d;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #888;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .product-image .fallback-icon {
+            font-size: 4rem;
+            color: #888;
+            opacity: 0.7;
+        }
+
+        .product-image .image-error {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-category {
+            color: #ff7f00;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background: #27ae60;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .product-sizes {
+            margin-bottom: 1rem;
+        }
+
+        .sizes-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .size-btn:hover, .size-btn.selected {
+            border-color: #ff7f00;
+            background: #ff7f00;
+            color: white;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart, .quick-order {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart {
+            background: #ff7f00;
+            color: white;
+        }
+
+        .add-to-cart:hover {
+            background: #e6710a;
+            transform: translateY(-2px);
+        }
+
+        .quick-order {
+            background: #25D366;
+            color: white;
+        }
+
+        .quick-order:hover {
+            background: #1ea952;
+            transform: translateY(-2px);
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scroll to top button */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff7f00;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .scroll-top-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top-btn:hover {
+            background: #e6710a;
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Mobile responsive styles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .main-content {
+                margin-top: 160px; /* Increased for better mobile visibility */
+                padding-top: 15px;
+            }
+            
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .filter-group {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+                line-height: 1.3;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .delivery-info {
+                padding: 1rem 1.5rem;
+                margin: 0 1rem;
+                width: calc(100% - 2rem);
+            }
+
+            .delivery-main {
+                font-size: 1rem;
+            }
+
+            .delivery-locations {
+                font-size: 0.85rem;
+            }
+            
+            .navbar {
+                justify-content: flex-start;
+                gap: 0.5rem;
+                padding: 0.5rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .nav-item {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-actions {
+                justify-content: center;
+                font-size: 0.9rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+                padding: 0 0.5rem;
+            }
+
+            .product-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .add-to-cart, .quick-order {
+                font-size: 0.9rem;
+                padding: 0.7rem;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .filters-section {
+                margin: 0 0.5rem 2rem 0.5rem;
+                padding: 1rem;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .apply-filters, .clear-filters {
+                width: 100%;
+                padding: 0.7rem;
+            }
+
+            /* Fixed header overlap issue on mobile */
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                z-index: 1000;
+            }
+
+            /* Ensure content is visible on mobile */
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .cart-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            /* Better mobile text sizing */
+            .product-name {
+                font-size: 1.1rem;
+            }
+
+            .current-price {
+                font-size: 1.3rem;
+            }
+
+            .product-category {
+                font-size: 0.75rem;
+            }
+
+            /* Mobile scroll improvements */
+            .navbar {
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE */
+            }
+
+            .navbar::-webkit-scrollbar {
+                display: none; /* Chrome, Safari */
+            }
+        }
+
+        /* Extra small mobile devices */
+        @media (max-width: 480px) {
+            .main-content {
+                margin-top: 180px; /* Even more space for very small screens */
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                padding: 0;
+            }
+
+            .delivery-info {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+        }
+
+        /* Landscape mobile orientation fix */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .main-content {
+                margin-top: 120px;
+            }
+
+            .hero {
+                padding: 1.5rem 0;
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Debug info styles */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info" id="debugInfo"></div>
+
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <span class="logo-icon">👞</span>
+                    <h1>Bayosa Footwear</h1>
+                </div>
+                <div class="header-actions">
+                    <div>📍 सिवेरा रोड, झाडोली</div>
+                    <div>📞 +91-90795-69517</div>
+                    <button class="cart-btn" onclick="openCart()">
+                        🛒 Cart
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="navbar">
+                <a href="index.html" class="nav-item">सभी उत्पाद</a>
+                <a href="mens-shoes.html" class="nav-item">पुरुषों के जूते</a>
+                <a href="womens-shoes.html" class="nav-item">महिलाओं के जूते</a>
+                <a href="kids-shoes.html" class="nav-item">बच्चों के जूते</a>
+                <a href="formal-shoes.html" class="nav-item">फॉर्मल</a>
+                <a href="sports-shoes.html" class="nav-item active">स्पोर्ट्स</a>
+                <a href="casual-shoes.html" class="nav-item">कैजुअल</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="hero">
+                <h2>🏃 स्पोर्ट्स जूते</h2>
+                <p class="hero-subtitle">एक्टिव लाइफस्टाइल के लिए बेस्ट चॉइस</p>
+                <div class="delivery-info">
+                    <span class="delivery-main">🚚 Free Home Delivery | 💳 Cash on Delivery | 📱 WhatsApp Orders</span>
+                    <span class="delivery-locations">📍 मालनू, सिवेरा, झाडोली में होम डिलीवरी उपलब्ध</span>
+                </div>
+            </section>
+
+            <section class="filters-section">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="">सभी Categories</option>
+                            <option value="mens">पुरुषों के</option>
+                            <option value="womens">महिलाओं के</option>
+                            <option value="kids">बच्चों के</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">ब्रांड</label>
+                        <select class="filter-select" id="brandFilter">
+                            <option value="">सभी ब्रांड</option>
+                            <option value="nike">Nike</option>
+                            <option value="adidas">Adidas</option>
+                            <option value="puma">Puma</option>
+                            <option value="action">Action</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">रंग</label>
+                        <select class="filter-select" id="colorFilter">
+                            <option value="">सभी रंग</option>
+                            <option value="black">काला</option>
+                            <option value="white">सफेद</option>
+                            <option value="blue">नीला</option>
+                            <option value="red">लाल</option>
+                            <option value="grey">धूसर</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">साइज़</label>
+                        <select class="filter-select" id="sizeFilter">
+                            <option value="">सभी साइज़</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">कीमत</label>
+                        <div class="price-range">
+                            <input type="number" class="price-input" id="minPrice" placeholder="Min ₹">
+                            <span>-</span>
+                            <input type="number" class="price-input" id="maxPrice" placeholder="Max ₹">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="apply-filters" onclick="applyFilters()">🔍 Filter Apply करें</button>
+                    <button class="clear-filters" onclick="clearFilters()">🗑️ Clear करें</button>
+                </div>
+            </section>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Products लोड हो रहे हैं...</p>
+            </div>
+
+            <section class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
+            </section>
+
+            <div class="no-products" id="noProducts" style="display: none;">
+                <h3>😔 कोई स्पोर्ट्स जूते नहीं मिले</h3>
+                <p>कृपया अलग filters try करें</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scroll to top button -->
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">
+        ↑
+    </button>
+
+    <script>
+        // Global Variables
+        let products = [];
+        let cart = [];
+        let filteredProducts = [];
+        let currentOrderProduct = null;
+        let currentOrderSize = null;
+        const phoneNumber = "919079569517";
+
+        // Enhanced Header scroll functionality - only show on intentional scroll up
+        let lastScrollTop = 0;
+        let scrollDirection = 'up';
+        let scrollThreshold = 100;
+        const header = document.getElementById('header');
+
+        // Default products for fallback with real image URLs
+        function getDefaultProducts() {
+            return [
+                {
+                    id: 1,
+                    name: "Nike Air Max Sports",
+                    category: "mens",
+                    type: "sports",
+                    brand: "nike",
+                    color: "black",
+                    price: 2899,
+                    original_price: 3299,
+                    discount: 12,
+                    sizes: ["7", "8", "9", "10"],
+                    image: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/6cc5ef90-a93e-4b8c-9dbd-5de7e3c5bb50/air-max-270-mens-shoes-KkLcGR.png",
+                    badge: "BESTSELLER",
+                    is_active: true
+                },
+                {
+                    id: 2,
+                    name: "Adidas Running Shoes",
+                    category: "womens",
+                    type: "sports",
+                    brand: "adidas",
+                    color: "white",
+                    price: 2599,
+                    original_price: 2999,
+                    discount: 13,
+                    sizes: ["5", "6", "7", "8"],
+                    image: "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/fbaf991a78bc4896a3e9ad7800abcec6_9366/Ultraboost_22_Shoes_White_GZ0127_01_standard.jpg",
+                    badge: "NEW",
+                    is_active: true
+                },
+                {
+                    id: 3,
+                    name: "Puma Sports Sneakers",
+                    category: "kids",
+                    type: "sports",
+                    brand: "puma",
+                    color: "blue",
+                    price: 1899,
+                    original_price: 2299,
+                    discount: 17,
+                    sizes: ["3", "4", "5", "6"],
+                    image: "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_600,h_600/global/193983/01/sv01/fnd/IND/fmt/png/Comet-2-Alt-Kids'-Shoes",
+                    badge: "HOT",
+                    is_active: true
+                },
+                {
+                    id: 4,
+                    name: "Action Sports Shoes",
+                    category: "mens",
+                    type: "sports",
+                    brand: "action",
+                    color: "grey",
+                    price: 1299,
+                    original_price: 1599,
+                    discount: 19,
+                    sizes: ["6", "7", "8", "9", "10"],
+                    image: "",
+                    badge: "VALUE",
+                    is_active: true
+                }
+            ];
+        }
+
+        // Enhanced scroll functionality with improved header behavior
+        function handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            
+            // Show/hide scroll to top button
+            if (scrollTop > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+            
+            // Enhanced header hide/show logic
+            if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                // Scrolling down - hide header
+                if (scrollDirection !== 'down') {
+                    scrollDirection = 'down';
+                    header.classList.add('hide');
+                }
+            } else if (scrollTop < lastScrollTop) {
+                // Scrolling up - show header only if significant upward scroll
+                const scrollDifference = lastScrollTop - scrollTop;
+                if (scrollDirection !== 'up' && scrollDifference > 50) {
+                    scrollDirection = 'up';
+                    header.classList.remove('hide');
+                }
+            }
+            
+            // Always show header at top of page
+            if (scrollTop <= scrollThreshold) {
+                header.classList.remove('hide');
+                scrollDirection = 'up';
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Load products from Supabase or fallback to default
+        async function loadProducts() {
+            showLoading();
+            try {
+                console.log('Loading sports products...');
+                
+                if (window.sportsDataManager) {
+                    products = await window.sportsDataManager.getProducts();
+                    console.log('Products loaded from Supabase:', products.length);
+                } else {
+                    console.log('DataManager not available, using defaults');
+                    products = [];
+                }
+                
+                // If no products in Supabase, use default products
+                if (products.length === 0) {
+                    console.log('No products found, using default sports products');
+                    products = getDefaultProducts();
+                }
+                
+                filteredProducts = [...products];
+                displayProducts(products);
+                console.log('Products displayed successfully:', products.length);
+                
+                // Debug logging
+                updateDebugInfo(`Loaded ${products.length} products`);
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                console.log('Using fallback default products');
+                
+                // Fallback to default products
+                products = getDefaultProducts();
+                filteredProducts = [...products];
+                displayProducts(products);
+                updateDebugInfo(`Error: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Enhanced WhatsApp message with proper image handling and location info
+        function createWhatsAppMessage(product, customerInfo, selectedSize) {
+            let message = `🛍️ *QUICK ORDER - Bayosa Footwear*\n\n`;
+            
+            message += `*Product Details:*\n`;
+            message += `🏃 *Name:* ${product.name}\n`;
+            message += `💰 *Price:* ₹${product.price}\n`;
+            message += `📏 *Size:* ${selectedSize}\n`;
+            message += `🏷️ *Category:* ${getCategoryName(product.category)} - स्पोर्ट्स\n`;
+            message += `🎨 *Color:* ${product.color || 'N/A'}\n`;
+            message += `🏪 *Brand:* ${product.brand || 'N/A'}\n`;
+            
+            // Add actual image URL if available
+            if (product.image && (product.image.startsWith('http') || product.image.startsWith('https'))) {
+                message += `📸 *Product Image:* ${product.image}\n`;
+            }
+            
+            message += `\n*Customer Details:*\n`;
+            message += `📝 *Name:* ${customerInfo.name}\n`;
+            message += `📞 *Phone:* ${customerInfo.phone}\n`;
+            message += `📍 *Address:* ${customerInfo.address}\n`;
+            
+            if (customerInfo.message) {
+                message += `💬 *Message:* ${customerInfo.message}\n`;
+            }
+            
+            message += `\n🏪 *Bayosa Footwear*\n`;
+            message += `📍 सिवेरा रोड, झाडोली\n`;
+            message += `🚚 *Free Home Delivery:* मालनू, सिवेरा, झाडोली\n`;
+            message += `⏰ *Order Time:* ${new Date().toLocaleString('hi-IN')}\n`;
+            message += `\n🙏 कृपया availability confirm करें। धन्यवाद!`;
+            
+            return message;
+        }
+
+        // Load cart from memory (no localStorage)
+        function loadCart() {
+            // Cart is already initialized as empty array
+            cart = cart || [];
+        }
+
+        function saveCart() {
+            // In-memory storage only - no localStorage
+            console.log('Cart saved in memory:', cart.length, 'items');
+        }
+
+        // Apply filters
+        async function applyFilters() {
+            showLoading();
+            
+            const filters = {
+                category: document.getElementById('categoryFilter').value,
+                brand: document.getElementById('brandFilter').value,
+                color: document.getElementById('colorFilter').value,
+                minPrice: parseInt(document.getElementById('minPrice').value) || null,
+                maxPrice: parseInt(document.getElementById('maxPrice').value) || null
+            };
+
+            // Remove empty filters
+            Object.keys(filters).forEach(key => {
+                if (!filters[key]) delete filters[key];
+            });
+
+            try {
+                if (Object.keys(filters).length > 0 && window.sportsDataManager) {
+                    filteredProducts = await window.sportsDataManager.getProducts(filters);
+                } else {
+                    filteredProducts = [...products];
+                }
+                
+                // Additional client-side filtering for size
+                const size = document.getElementById('sizeFilter').value;
+                if (size) {
+                    filteredProducts = filteredProducts.filter(product => 
+                        product.sizes && product.sizes.includes(size)
+                    );
+                }
+                
+                // Client-side filtering for any remaining filters
+                filteredProducts = filteredProducts.filter(product => {
+                    let matchesCategory = !filters.category || product.category === filters.category;
+                    let matchesBrand = !filters.brand || product.brand === filters.brand;
+                    let matchesColor = !filters.color || product.color === filters.color;
+                    let matchesPrice = (!filters.minPrice || product.price >= filters.minPrice) && 
+                                     (!filters.maxPrice || product.price <= filters.maxPrice);
+
+                    return matchesCategory && matchesBrand && matchesColor && matchesPrice;
+                });
+                
+                displayProducts(filteredProducts);
+                updateDebugInfo(`Filtered: ${filteredProducts.length} products`);
+                
+            } catch (error) {
+                console.error('Error applying filters:', error);
+                
+                // Fallback to client-side filtering
+                filteredProducts = products.filter(product => {
+                    let matchesCategory = !filters.category || product.category === filters.category;
+                    let matchesBrand = !filters.brand || product.brand === filters.brand;
+                    let matchesColor = !filters.color || product.color === filters.color;
+                    let matchesPrice = (!filters.minPrice || product.price >= filters.minPrice) && 
+                                     (!filters.maxPrice || product.price <= filters.maxPrice);
+                    
+                    const size = document.getElementById('sizeFilter').value;
+                    let matchesSize = !size || (product.sizes && product.sizes.includes(size));
+
+                    return matchesCategory && matchesBrand && matchesColor && matchesSize && matchesPrice;
+                });
+                displayProducts(filteredProducts);
+                updateDebugInfo(`Filter error: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('brandFilter').value = '';
+            document.getElementById('colorFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            
+            loadProducts();
+        }
+
+        // Fixed function for rendering product image
+        function renderProductImage(product) {
+            if (product.image && product.image.trim() !== '') {
+                console.log('Rendering image for product:', product.name, 'Image URL:', product.image);
+                return `
+                    <img src="${product.image}" 
+                         alt="${product.name}" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('Image failed to load:', '${product.image}');"
+                         onload="this.style.opacity='1'; console.log('Image loaded successfully:', '${product.image}');"
+                         style="opacity: 0; transition: opacity 0.3s;">
+                    <div class="fallback-icon" style="display: none;">🏃</div>
+                `;
+            } else {
+                console.log('No image URL for product:', product.name);
+                return `<div class="fallback-icon">🏃</div>`;
+            }
+        }
+
+        function displayProducts(productsToShow) {
+            const productsGrid = document.getElementById('productsGrid');
+            const noProducts = document.getElementById('noProducts');
+            
+            console.log('Displaying products:', productsToShow.length);
+            
+            if (productsToShow.length === 0) {
+                productsGrid.innerHTML = '';
+                noProducts.style.display = 'block';
+                return;
+            }
+            
+            noProducts.style.display = 'none';
+            
+            productsGrid.innerHTML = productsToShow.map(product => {
+                console.log('Product data:', {
+                    name: product.name,
+                    image: product.image,
+                    sizes: product.sizes
+                });
+                
+                return `
+                <div class="product-card" data-product-id="${product.id}">
+                    <div class="product-badge">${product.badge || 'NEW'}</div>
+                    <div class="product-image">
+                        ${renderProductImage(product)}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${getCategoryName(product.category)} - स्पोर्ट्स</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">
+                            <span class="current-price">₹${product.price}</span>
+                            ${product.discount > 0 ? `
+                                <span class="original-price">₹${product.original_price}</span>
+                                <span class="discount">${product.discount}% OFF</span>
+                            ` : ''}
+                        </div>
+                        <div class="product-sizes">
+                            <span class="sizes-label">उपलब्ध साइज़:</span>
+                            <div class="size-options">
+                                ${(product.sizes || []).map(size => `
+                                    <button class="size-btn" onclick="selectSize(this, '${product.id}', '${size}')">${size}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" onclick="addToCart(${product.id})">
+                                🛒 Cart में Add करें
+                            </button>
+                            <button class="quick-order" onclick="quickOrderWhatsApp(${product.id})">
+                                📱 Quick Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'mens': 'पुरुष',
+                'womens': 'महिला',
+                'kids': 'बच्चे'
+            };
+            return names[category] || category;
+        }
+
+        function selectSize(button, productId, size) {
+            const productCard = button.closest('.product-card');
+            productCard.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id == productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            const selectedSize = selectedSizeBtn.textContent;
+            
+            const existingItem = cart.find(item => 
+                item.id == productId && item.selectedSize === selectedSize
+            );
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    selectedSize: selectedSize,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            saveCart();
+            
+            const button = productCard.querySelector('.add-to-cart');
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Added!';
+            button.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#ff7f00';
+            }, 2000);
+        }
+
+        function quickOrderWhatsApp(productId) {
+            const product = products.find(p => p.id == productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            const selectedSize = selectedSizeBtn.textContent;
+            
+            // Simple order flow for sports shoes page
+            const customerName = prompt('आपका नाम:');
+            const customerPhone = prompt('आपका फोन नंबर:');
+            const customerAddress = prompt('आपका पूरा पता:');
+            
+            if (!customerName || !customerPhone || !customerAddress) {
+                alert('कृपया सभी details भरें!');
+                return;
+            }
+            
+            const customerInfo = {
+                name: customerName,
+                phone: customerPhone,
+                address: customerAddress,
+                message: ''
+            };
+            
+            const whatsappMessage = createWhatsAppMessage(product, customerInfo, selectedSize);
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappURL, '_blank');
+            
+            // Show success message
+            setTimeout(() => {
+                alert('आपका order WhatsApp पर भेज दिया गया है! जल्द ही आपसे संपर्क किया जाएगा।');
+            }, 500);
+        }
+
+        function openCart() {
+            alert('Cart feature main website (index.html) पर उपलब्ध है। कृपया main page पर जाकर cart का उपयोग करें।');
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('productsGrid').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('productsGrid').style.opacity = '1';
+        }
+
+        // Debug functions
+        function updateDebugInfo(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.textContent = message;
+            debugInfo.style.display = 'block';
+            setTimeout(() => {
+                debugInfo.style.display = 'none';
+            }, 5000);
+        }
+
+        function debugImageLoading() {
+            console.log('=== DEBUG: Image Loading Analysis ===');
+            console.log('Current products:', products.length);
+            
+            products.forEach((product, index) => {
+                console.log(`Product ${index + 1}:`, {
+                    name: product.name,
+                    image: product.image,
+                    hasImage: !!(product.image && product.image.trim()),
+                    imageLength: product.image ? product.image.length : 0
+                });
+                
+                if (product.image) {
+                    // Test if image URL is accessible
+                    const img = new Image();
+                    img.onload = () => console.log(`✅ Image loads: ${product.name}`);
+                    img.onerror = () => console.log(`❌ Image fails: ${product.name} - ${product.image}`);
+                    img.src = product.image;
+                }
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded - Starting sports shoes page initialization...');
+            
+            try {
+                await loadProducts();
+                loadCart();
+                updateCartCount();
+                
+                // Add enhanced scroll event listener
+                let ticking = false;
+                window.addEventListener('scroll', function() {
+                    if (!ticking) {
+                        requestAnimationFrame(function() {
+                            handleScroll();
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+                
+                console.log('Sports shoes page initialization complete!');
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
+
+            // Enhanced mobile viewport handling
+            function handleViewportChange() {
+                // Force a reflow to ensure proper layout on mobile
+                if (window.innerWidth <= 768) {
+                    document.body.style.overflow = 'visible';
+                    setTimeout(() => {
+                        window.scrollTo(0, window.scrollY);
+                    }, 100);
+                }
+            }
+
+            // Listen for orientation changes and viewport changes
+            window.addEventListener('orientationchange', handleViewportChange);
+            window.addEventListener('resize', handleViewportChange);
+            
+            // Initial mobile layout fix
+            if (window.innerWidth <= 768) {
+                handleViewportChange();
+            }
+        });
+
+        // Auto-debug after loading
+        setTimeout(() => {
+            debugImageLoading();
+        }, 3000);
+
+        // Test function for manual debugging
+        window.testImageLoading = debugImageLoading;
+        
+        console.log('Bayosa Footwear - Sports Shoes page script loaded successfully with enhanced mobile features and location info!');
+        console.log('🔍 Debug tools available: call testImageLoading() in console');
+    </script>
+</body>
+</html>
