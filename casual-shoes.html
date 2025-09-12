@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कैजुअल जूते - Bayosa Footwear</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://quwkatpuuzhyfxsrmxxi.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1d2thdHB1dXpoeWZ4c3JteHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNTM0NTUsImV4cCI6MjA3MjcyOTQ1NX0.4nf8GvrLRWksHMBNnBk828S-r3h0xlgLRI0ZIvtGUus'
+        
+        // Initialize Supabase
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase connected successfully!');
+        } catch (error) {
+            console.error('Supabase connection error:', error);
+        }
+        
+        class CasualDataManager {
+            async getProducts(filters = {}) {
+                try {
+                    if (!supabase) {
+                        throw new Error('Supabase not initialized');
+                    }
+                    
+                    let query = supabase
+                        .from('products')
+                        .select('*')
+                        .eq('is_active', true)
+                        .eq('type', 'casual')
+                        .order('created_at', { ascending: false })
+                    
+                    if (filters.category) query = query.eq('category', filters.category)
+                    if (filters.brand) query = query.eq('brand', filters.brand)
+                    if (filters.color) query = query.eq('color', filters.color)
+                    if (filters.minPrice) query = query.gte('price', filters.minPrice)
+                    if (filters.maxPrice) query = query.lte('price', filters.maxPrice)
+                    
+                    const { data, error } = await query
+                    
+                    if (error) {
+                        console.error('Error fetching products:', error)
+                        return []
+                    }
+                    
+                    return data || []
+                } catch (err) {
+                    console.error('Network error:', err)
+                    return []
+                }
+            }
+        }
+        
+        window.casualDataManager = new CasualDataManager()
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .header.hide {
+            transform: translateY(-100%);
+        }
+
+        .main-content {
+            margin-top: 160px;
+            min-height: calc(100vh - 160px);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .cart-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #e74c3c;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: #27ae60;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .delivery-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            margin-bottom: 1rem;
+        }
+
+        .service-areas {
+            background: rgba(46, 213, 115, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            margin-top: 1rem;
+            border: 2px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .service-areas h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .filter-select, .price-input {
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus, .price-input:focus {
+            border-color: #27ae60;
+            outline: none;
+        }
+
+        .price-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .price-input {
+            width: 100px;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .apply-filters, .clear-filters {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .apply-filters {
+            background: #27ae60;
+            color: white;
+        }
+
+        .apply-filters:hover {
+            background: #229954;
+        }
+
+        .clear-filters {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .clear-filters:hover {
+            background: #7f8c8d;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Enhanced Image Container with 3-Image Scrolling */
+        .product-images-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .product-image-main {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        }
+
+        .product-image-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image-main:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Image navigation arrows */
+        .image-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 5;
+        }
+
+        .product-images-container:hover .image-nav {
+            opacity: 1;
+        }
+
+        .image-nav.prev {
+            left: 10px;
+        }
+
+        .image-nav.next {
+            right: 10px;
+        }
+
+        .image-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Image indicators (dots) */
+        .image-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem;
+            border-radius: 15px;
+            z-index: 5;
+        }
+
+        .image-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-dot.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-category {
+            color: #27ae60;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background: #27ae60;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .product-sizes {
+            margin-bottom: 1rem;
+        }
+
+        .sizes-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .size-btn:hover, .size-btn.selected {
+            border-color: #27ae60;
+            background: #27ae60;
+            color: white;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart, .quick-order, .view-details {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .add-to-cart {
+            background: #27ae60;
+            color: white;
+        }
+
+        .add-to-cart:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .quick-order {
+            background: #25D366;
+            color: white;
+        }
+
+        .quick-order:hover {
+            background: #1ea952;
+            transform: translateY(-2px);
+        }
+
+        .view-details {
+            background: #f39c12;
+            color: white;
+        }
+
+        .view-details:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        /* Product Detail Modal */
+        .product-detail-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .product-detail-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .product-detail-images {
+            flex: 1;
+            background: #f8f9fa;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .product-detail-main-image {
+            width: 100%;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-detail-main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .product-detail-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            justify-content: center;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-detail-info {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .close-detail-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 10;
+        }
+
+        .product-detail-category {
+            color: #27ae60;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-detail-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .product-detail-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-detail-price {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-current-price {
+            font-size: 2rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .detail-original-price {
+            font-size: 1.2rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+            margin-left: 1rem;
+        }
+
+        .detail-discount {
+            background: #27ae60;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .product-detail-sizes {
+            margin-bottom: 2rem;
+        }
+
+        .detail-sizes-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .detail-size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-size-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .detail-size-btn:hover, .detail-size-btn.selected {
+            border-color: #27ae60;
+            background: #27ae60;
+            color: white;
+        }
+
+        .product-detail-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .detail-add-to-cart, .detail-quick-order {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .detail-add-to-cart {
+            background: #27ae60;
+            color: white;
+        }
+
+        .detail-add-to-cart:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .detail-quick-order {
+            background: #25D366;
+            color: white;
+        }
+
+        .detail-quick-order:hover {
+            background: #1ea952;
+            transform: translateY(-2px);
+        }
+
+        /* Cart sidebar styles */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 1rem;
+            background: #27ae60;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            padding: 1rem;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            overflow: hidden;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-size {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .cart-item-price {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .cart-total {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-final {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding-top: 0.5rem;
+            border-top: 2px solid #ddd;
+        }
+
+        .checkout-section {
+            padding: 1rem;
+        }
+
+        .checkout-btn, .whatsapp-order {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .checkout-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .checkout-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .whatsapp-order {
+            background: #25D366;
+            color: white;
+        }
+
+        .whatsapp-order:hover {
+            background: #1ea952;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .product-summary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #27ae60;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #27ae60;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel, .btn-submit {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-submit {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-submit:hover {
+            background: #128C7E;
+        }
+
+        /* Compact Footer CSS */
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem 0; /* Reduced from 3rem to 2rem */
+            margin-top: 2rem; /* Reduced from 3rem to 2rem */
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Reduced from 250px to 200px */
+            gap: 1.5rem; /* Reduced from 2rem to 1.5rem */
+        }
+
+        .footer h4 {
+            font-size: 1rem; /* Smaller heading */
+            margin-bottom: 0.8rem; /* Reduced spacing */
+            color: #333;
+        }
+
+        .footer p {
+            font-size: 0.9rem; /* Smaller text */
+            margin-bottom: 0.4rem; /* Reduced spacing */
+            color: #666;
+        }
+
+        .admin-footer-btn {
+            padding: 0.6rem 1rem; /* Reduced button padding */
+            font-size: 0.85rem; /* Smaller button text */
+            margin-top: 0.3rem; /* Reduced margins */
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .admin-footer-btn:hover {
+            background: #229954;
+        }
+
+        /* Scroll to top button */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .scroll-top-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top-btn:hover {
+            background: #2ecc71;
+            transform: scale(1.1);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 100px;
+            }
+            
+            .header-top {
+                margin-bottom: 0.3rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                font-size: 1.2rem;
+            }
+            
+            .header-actions {
+                gap: 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .cart-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            .navbar {
+                justify-content: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .nav-item {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            .cart-sidebar {
+                width: 100vw;
+                right: -100vw;
+            }
+            
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: auto;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+            }
+
+            .product-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: 2% auto;
+                padding: 1.5rem;
+                width: 95%;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+
+            .delivery-info, .service-areas {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .service-areas h3 {
+                font-size: 1.1rem;
+            }
+
+            /* Product detail modal mobile adjustments */
+            .product-detail-content {
+                flex-direction: column;
+                margin: 1% auto;
+                width: 98%;
+                max-height: 95vh;
+            }
+            
+            .product-detail-images {
+                min-height: 300px;
+            }
+            
+            .product-detail-main-image {
+                height: 250px;
+            }
+            
+            .product-detail-info {
+                padding: 1rem;
+            }
+
+            /* Mobile footer adjustments */
+            .footer {
+                padding: 1.5rem 0;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+    
+    <!-- Quick Order Modal -->
+    <div id="quickOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Quick Order Details</h3>
+                <button class="close-btn" onclick="closeQuickOrderModal()">&times;</button>
+            </div>
+            
+            <div class="product-summary" id="productSummary">
+                <!-- Product details will be inserted here -->
+            </div>
+            
+            <form id="quickOrderForm">
+                <div class="form-group">
+                    <label class="form-label" for="customerName">आपका नाम <span class="required">*</span></label>
+                    <input type="text" id="customerName" class="form-input" placeholder="अपना पूरा नाम लिखें" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerPhone">फोन नंबर <span class="required">*</span></label>
+                    <input type="tel" id="customerPhone" class="form-input" placeholder="10 अंकों का फोन नंबर" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerAddress">पूरा पता <span class="required">*</span></label>
+                    <textarea id="customerAddress" class="form-textarea" placeholder="घर का नंबर, गली, शहर, राज्य, पिन कोड" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="customerMessage">अतिरिक्त जानकारी (वैकल्पिक)</label>
+                    <textarea id="customerMessage" class="form-textarea" placeholder="कोई विशेष आवश्यकता या message"></textarea>
+                </div>
+            </form>
+            
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeQuickOrderModal()">Cancel</button>
+                <button type="button" class="btn-submit" onclick="submitQuickOrder()">WhatsApp पर Order करें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="product-detail-modal">
+        <div class="product-detail-content">
+            <button class="close-detail-btn" onclick="closeProductDetail()">&times;</button>
+            
+            <!-- Left side: Images -->
+            <div class="product-detail-images">
+                <div class="product-detail-main-image" id="detailMainImage">
+                    <!-- Large main image -->
+                </div>
+                <div class="product-detail-thumbnails" id="detailThumbnails">
+                    <!-- Thumbnail images for navigation -->
+                </div>
+            </div>
+            
+            <!-- Right side: Product information -->
+            <div class="product-detail-info">
+                <div class="product-detail-category" id="detailCategory"></div>
+                <h2 class="product-detail-title" id="detailTitle"></h2>
+                <div class="product-detail-description" id="detailDescription"></div>
+                <div class="product-detail-price" id="detailPrice"></div>
+                
+                <div class="product-detail-sizes">
+                    <span class="detail-sizes-label">उपलब्ध साइज़:</span>
+                    <div class="detail-size-options" id="detailSizeOptions"></div>
+                </div>
+                
+                <div class="product-detail-actions">
+                    <button class="detail-add-to-cart" onclick="addToCartFromDetail()">
+                        🛒 Cart में Add करें
+                    </button>
+                    <button class="detail-quick-order" onclick="quickOrderFromDetail()">
+                        📱 Quick Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <span class="logo-icon">👞</span>
+                    <h1>Bayosa Footwear</h1>
+                </div>
+                <div class="header-actions">
+                    <div>📍 सिवेरा रोड, झाडोली</div>
+                    <div>📞 +91-90795-69517</div>
+                    <button class="cart-btn" onclick="openCart()">
+                        🛒 Cart
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="navbar">
+                <a href="index.html" class="nav-item">सभी उत्पाद</a>
+                <a href="mens-shoes.html" class="nav-item">पुरुषों के जूते</a>
+                <a href="womens-shoes.html" class="nav-item">महिलाओं के जूते</a>
+                <a href="kids-shoes.html" class="nav-item">बच्चों के जूते</a>
+                <a href="formal-shoes.html" class="nav-item">फॉर्मल</a>
+                <a href="sports-shoes.html" class="nav-item">स्पोर्ट्स</a>
+                <a href="casual-shoes.html" class="nav-item active">कैजुअल</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="hero">
+                <h2>👕 कैजुअल जूते</h2>
+                <p>रोजमर्रा की जिंदगी के लिए आरामदायक स्टाइल</p>
+                <div class="delivery-info">
+                    🚚 Free Home Delivery | 💳 Cash on Delivery | 📱 WhatsApp Orders
+                </div>
+                <div class="service-areas">
+                    <h3>🏠 घर तक डिलीवरी उपलब्ध</h3>
+                    <p> मालनू • सिवेरा • झाडोली में फ्री होम डिलीवरी</p>
+                </div>
+            </section>
+
+            <section class="filters-section">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="">सभी Categories</option>
+                            <option value="mens">पुरुषों के</option>
+                            <option value="womens">महिलाओं के</option>
+                            <option value="kids">बच्चों के</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">ब्रांड</label>
+                        <select class="filter-select" id="brandFilter">
+                            <option value="">सभी ब्रांड</option>
+                            <option value="nike">Nike</option>
+                            <option value="adidas">Adidas</option>
+                            <option value="puma">Puma</option>
+                            <option value="bata">Bata</option>
+                            <option value="liberty">Liberty</option>
+                            <option value="action">Action</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">रंग</label>
+                        <select class="filter-select" id="colorFilter">
+                            <option value="">सभी रंग</option>
+                            <option value="black">काला</option>
+                            <option value="brown">भूरा</option>
+                            <option value="white">सफेद</option>
+                            <option value="blue">नीला</option>
+                            <option value="grey">धूसर</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">साइज़</label>
+                        <select class="filter-select" id="sizeFilter">
+                            <option value="">सभी साइज़</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">कीमत</label>
+                        <div class="price-range">
+                            <input type="number" class="price-input" id="minPrice" placeholder="Min ₹">
+                            <span>-</span>
+                            <input type="number" class="price-input" id="maxPrice" placeholder="Max ₹">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="apply-filters" onclick="applyFilters()">🔍 Filter Apply करें</button>
+                    <button class="clear-filters" onclick="clearFilters()">🗑️ Clear करें</button>
+                </div>
+            </section>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Products लोड हो रहे हैं...</p>
+            </div>
+
+            <section class="products-grid" id="productsGrid">
+                <!-- Products will be dynamically loaded here -->
+            </section>
+
+            <div class="no-products" id="noProducts" style="display: none;">
+                <h3>😔 कोई कैजुअल जूते नहीं मिले</h3>
+                <p>कृपया अलग filters try करें</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>🛒 Your Cart</h3>
+            <button class="cart-close" onclick="closeCart()">&times;</button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be loaded here -->
+        </div>
+        
+        <div class="cart-total" id="cartTotal" style="display: none;">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span id="subtotal">₹0</span>
+            </div>
+            <div class="total-row">
+                <span>Delivery:</span>
+                <span style="color: #27ae60;">FREE</span>
+            </div>
+            <div class="total-row total-final">
+                <span>Total:</span>
+                <span id="finalTotal">₹0</span>
+            </div>
+        </div>
+        
+        <div class="checkout-section" id="checkoutSection" style="display: none;">
+            <button class="checkout-btn" onclick="proceedToCheckout()">
+                💳 Proceed to Checkout
+            </button>
+            <button class="whatsapp-order" onclick="orderViaWhatsApp()">
+                📱 Order via WhatsApp
+            </button>
+        </div>
+        
+        <div style="padding: 1rem; text-align: center; color: #666;" id="emptyCartMessage">
+            🛒 Your cart is empty<br>
+            <small>Add some products to get started!</small>
+        </div>
+    </div>
+
+    <!-- Compact Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h4>📍 हमारी लोकेशन</h4>
+                    <p>सिवेरा रोड, झाडोली</p>
+                    <p>📞 +91-90795-69517</p>
+                </div>
+                
+                <div>
+                    <h4>🚚 डिलीवरी सर्विस</h4>
+                    <p>मालनू • सिवेरा • झाडोली</p>
+                    <p>Free Home Delivery</p>
+                </div>
+                
+                <div>
+                    <h4>⏰ समय</h4>
+                    <p>सुबह 9:00 से रात 8:00</p>
+                    <p>रविवार बंद</p>
+                </div>
+                
+                <div>
+                    <h4>💳 Payment Options</h4>
+                    <p>Cash on Delivery</p>
+                    <p>UPI • PhonePe • GPay</p>
+                    <button class="admin-footer-btn" onclick="window.location.href='admin.html'">Admin Panel</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">
+        ↑
+    </button>
+
+    <script>
+        // Global Variables
+        let products = [];
+        let cart = [];
+        let filteredProducts = [];
+        let currentOrderProduct = null;
+        let currentOrderSize = null;
+        let currentDetailProduct = null;
+        let currentImageIndex = 0;
+        const phoneNumber = "919079569517";
+
+        // Enhanced Header scroll functionality
+        let lastScrollTop = 0;
+        let scrollDirection = 'up';
+        let scrollThreshold = 100;
+        const header = document.getElementById('header');
+
+        // Default products for fallback
+        function getDefaultProducts() {
+            return [
+                {
+                    id: 1,
+                    name: "Casual Loafers Brown",
+                    category: "mens",
+                    type: "casual",
+                    brand: "bata",
+                    color: "brown",
+                    price: 1299,
+                    original_price: 1599,
+                    discount: 19,
+                    sizes: ["6", "7", "8", "9", "10"],
+                    images: [
+                        "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400",
+                        "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400",
+                        "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400"
+                    ],
+                    badge: "COMFORT",
+                    description: "आरामदायक और स्टाइलिश कैजुअल जूते जो रोजमर्रा के उपयोग के लिए परफेक्ट हैं।",
+                    is_active: true
+                },
+                {
+                    id: 2,
+                    name: "Casual Sneakers White",
+                    category: "womens",
+                    type: "casual",
+                    brand: "nike",
+                    color: "white",
+                    price: 2499,
+                    original_price: 2999,
+                    discount: 17,
+                    sizes: ["5", "6", "7", "8", "9"],
+                    images: [
+                        "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400",
+                        "https://images.unsplash.com/photo-1584735175315-9d5df23860e6?w=400"
+                    ],
+                    badge: "TRENDY",
+                    description: "फैशनेबल और आरामदायक महिलाओं के लिए कैजुअल स्नीकर्स।",
+                    is_active: true
+                }
+            ];
+        }
+
+        function handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            
+            if (scrollTop > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+            
+            if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                if (scrollDirection !== 'down') {
+                    scrollDirection = 'down';
+                    header.classList.add('hide');
+                }
+            } else if (scrollTop < lastScrollTop) {
+                const scrollDifference = lastScrollTop - scrollTop;
+                if (scrollDirection !== 'up' && scrollDifference > 50) {
+                    scrollDirection = 'up';
+                    header.classList.remove('hide');
+                }
+            }
+            
+            if (scrollTop <= scrollThreshold) {
+                header.classList.remove('hide');
+                scrollDirection = 'up';
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        async function loadProducts() {
+            showLoading();
+            try {
+                console.log('Loading products...');
+                
+                if (window.casualDataManager) {
+                    products = await window.casualDataManager.getProducts();
+                    console.log('Products loaded from Supabase:', products.length);
+                } else {
+                    console.log('DataManager not available, using defaults');
+                    products = [];
+                }
+                
+                if (products.length === 0) {
+                    console.log('No products found, using default products');
+                    products = getDefaultProducts();
+                }
+                
+                // Ensure images array exists
+                products.forEach(product => {
+                    if (!product.images || !Array.isArray(product.images)) {
+                        if (product.image) {
+                            product.images = [product.image];
+                        } else {
+                            product.images = [];
+                        }
+                    }
+                });
+                
+                filteredProducts = [...products];
+                displayProducts(products);
+                console.log('Products displayed successfully:', products.length);
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                products = getDefaultProducts();
+                filteredProducts = [...products];
+                displayProducts(products);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function createWhatsAppMessage(product, customerInfo, selectedSize) {
+            let message = `🛍️ *QUICK ORDER - Bayosa Footwear*\n\n`;
+            
+            message += `*Product Details:*\n`;
+            message += `👟 *Name:* ${product.name}\n`;
+            message += `💰 *Price:* ₹${product.price}\n`;
+            message += `📏 *Size:* ${selectedSize}\n`;
+            message += `🏷️ *Category:* ${getCategoryName(product.category)} - ${getTypeName(product.type)}\n`;
+            message += `🎨 *Color:* ${product.color || 'N/A'}\n`;
+            message += `🏪 *Brand:* ${product.brand || 'N/A'}\n`;
+            
+            if (product.images && product.images.length > 0 && product.images[0].startsWith('http')) {
+                message += `📸 *Product Image:* ${product.images[0]}\n`;
+            }
+            
+            message += `\n*Customer Details:*\n`;
+            message += `📝 *Name:* ${customerInfo.name}\n`;
+            message += `📞 *Phone:* ${customerInfo.phone}\n`;
+            message += `📍 *Address:* ${customerInfo.address}\n`;
+            
+            if (customerInfo.message) {
+                message += `💬 *Message:* ${customerInfo.message}\n`;
+            }
+            
+            message += `\n⏰ *Order Time:* ${new Date().toLocaleString('hi-IN')}\n`;
+            message += `🏠 *Delivery Available:* मलनू, सिवेरा, झाडोली\n`;
+            message += `\n🙏 कृपया availability confirm करें। धन्यवाद!`;
+            
+            return message;
+        }
+
+        function createCartWhatsAppMessage() {
+            let message = `🛍️ *नमस्ते! Bayosa Footwear से*\n\n*मुझे यह orders चाहिए:*\n\n`;
+            
+            cart.forEach((item, index) => {
+                message += `${index + 1}. *${item.name}*\n`;
+                message += `   📏 Size: ${item.selectedSize}\n`;
+                message += `   🔢 Qty: ${item.quantity}\n`;
+                message += `   💰 Price: ₹${item.price * item.quantity}\n`;
+                message += `   🏷️ ${getCategoryName(item.category)} - ${getTypeName(item.type)}\n`;
+                
+                if (item.images && item.images.length > 0 && item.images[0].startsWith('http')) {
+                    message += `   📸 Image: ${item.images[0]}\n`;
+                }
+                message += `\n`;
+            });
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            message += `💵 *Total Amount: ₹${total}*\n`;
+            message += `🚚 Free Home Delivery Available\n`;
+            message += `🏠 Service Areas: मलनू, सिवेरा, झाडोली\n`;
+            message += `⏰ Order Time: ${new Date().toLocaleString('hi-IN')}\n\n`;
+            message += `कृपया orders confirm करें और delivery details बताएं।\n*धन्यवाद!*`;
+
+            return message;
+        }
+
+        // Image scrolling functions
+        function changeProductImage(productId, direction) {
+            const product = products.find(p => p.id == productId);
+            if (!product || !product.images || product.images.length <= 1) return;
+            
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const currentIndex = parseInt(productCard.dataset.currentImageIndex) || 0;
+            let newIndex = currentIndex + direction;
+            
+            // Loop handling
+            if (newIndex >= product.images.length) newIndex = 0;
+            if (newIndex < 0) newIndex = product.images.length - 1;
+            
+            setProductImage(productId, newIndex);
+        }
+
+        function setProductImage(productId, index) {
+            const product = products.find(p => p.id == productId);
+            if (!product || !product.images || index >= product.images.length) return;
+            
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const imageMain = productCard.querySelector('.product-image-main');
+            const dots = productCard.querySelectorAll('.image-dot');
+            
+            // Update current index
+            productCard.dataset.currentImageIndex = index;
+            
+            // Change main image
+            if (product.images[index] && product.images[index].startsWith('http')) {
+                imageMain.innerHTML = `<img src="${product.images[index]}" alt="${product.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${getCategoryIcon(product.category, product.type)}';">`;
+            } else {
+                imageMain.innerHTML = getCategoryIcon(product.category, product.type);
+            }
+            
+            // Update active dot
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        // Product detail modal functions
+        function openProductDetail(productId) {
+            const product = products.find(p => p.id == productId);
+            if (!product) return;
+            
+            currentDetailProduct = product;
+            currentImageIndex = 0;
+            
+            // Update modal content
+            document.getElementById('detailCategory').textContent = `${getCategoryName(product.category)} - ${getTypeName(product.type)}`;
+            document.getElementById('detailTitle').textContent = product.name;
+            document.getElementById('detailDescription').textContent = product.description || 'उत्पाद की जानकारी उपलब्ध नहीं है।';
+            
+            // Update price
+            const priceContainer = document.getElementById('detailPrice');
+            priceContainer.innerHTML = `
+                <span class="detail-current-price">₹${product.price}</span>
+                ${product.discount > 0 ? `
+                    <span class="detail-original-price">₹${product.original_price}</span>
+                    <span class="detail-discount">${product.discount}% OFF</span>
+                ` : ''}
+            `;
+            
+            // Update sizes
+            const sizeContainer = document.getElementById('detailSizeOptions');
+            sizeContainer.innerHTML = (product.sizes || []).map(size => `
+                <button class="detail-size-btn" onclick="selectDetailSize(this, '${size}')">${size}</button>
+            `).join('');
+            
+            // Update images
+            updateDetailImages();
+            
+            // Show modal
+            document.getElementById('productDetailModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductDetail() {
+            document.getElementById('productDetailModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentDetailProduct = null;
+        }
+
+        function updateDetailImages() {
+            if (!currentDetailProduct) return;
+            
+            const mainImageContainer = document.getElementById('detailMainImage');
+            const thumbnailsContainer = document.getElementById('detailThumbnails');
+            
+            // Update main image
+            if (currentDetailProduct.images && currentDetailProduct.images.length > 0) {
+                const currentImage = currentDetailProduct.images[currentImageIndex];
+                if (currentImage && currentImage.startsWith('http')) {
+                    mainImageContainer.innerHTML = `<img src="${currentImage}" alt="${currentDetailProduct.name}">`;
+                } else {
+                    mainImageContainer.innerHTML = getCategoryIcon(currentDetailProduct.category, currentDetailProduct.type);
+                }
+            } else {
+                mainImageContainer.innerHTML = getCategoryIcon(currentDetailProduct.category, currentDetailProduct.type);
+            }
+            
+            // Update thumbnails
+            if (currentDetailProduct.images && currentDetailProduct.images.length > 1) {
+                thumbnailsContainer.innerHTML = currentDetailProduct.images.map((img, index) => `
+                    <div class="thumbnail ${index === currentImageIndex ? 'active' : ''}" onclick="setDetailImage(${index})">
+                        ${img && img.startsWith('http') ? 
+                            `<img src="${img}" alt="${currentDetailProduct.name}">` : 
+                            `<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 1.5rem;">${getCategoryIcon(currentDetailProduct.category, currentDetailProduct.type)}</div>`
+                        }
+                    </div>
+                `).join('');
+            } else {
+                thumbnailsContainer.innerHTML = '';
+            }
+        }
+
+        function setDetailImage(index) {
+            if (!currentDetailProduct || !currentDetailProduct.images || index >= currentDetailProduct.images.length) return;
+            currentImageIndex = index;
+            updateDetailImages();
+        }
+
+        function selectDetailSize(button, size) {
+            const sizeContainer = button.closest('.detail-size-options');
+            sizeContainer.querySelectorAll('.detail-size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        function addToCartFromDetail() {
+            if (!currentDetailProduct) return;
+            
+            const selectedSizeBtn = document.querySelector('.detail-size-btn.selected');
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            const selectedSize = selectedSizeBtn.textContent;
+            
+            const existingItem = cart.find(item => 
+                item.id == currentDetailProduct.id && item.selectedSize === selectedSize
+            );
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...currentDetailProduct,
+                    selectedSize: selectedSize,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            updateCartDisplay();
+            saveCart();
+            
+            alert('Product cart में add हो गया!');
+        }
+
+        function quickOrderFromDetail() {
+            if (!currentDetailProduct) return;
+            
+            const selectedSizeBtn = document.querySelector('.detail-size-btn.selected');
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            currentOrderProduct = currentDetailProduct;
+            currentOrderSize = selectedSizeBtn.textContent;
+            
+            closeProductDetail();
+            
+            // Open quick order modal
+            const productSummary = document.getElementById('productSummary');
+            const categoryIcon = getCategoryIcon(currentOrderProduct.category, currentOrderProduct.type);
+            
+            let summaryHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            `;
+            
+            if (currentOrderProduct.images && currentOrderProduct.images.length > 0 && currentOrderProduct.images[0].startsWith('http')) {
+                summaryHTML += `<img src="${currentOrderProduct.images[0]}" alt="${currentOrderProduct.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='${categoryIcon}';">`;
+            } else {
+                summaryHTML += categoryIcon;
+            }
+            
+            summaryHTML += `
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; font-size: 1.1rem;">${currentOrderProduct.name}</div>
+                        <div style="color: #666;">Size: ${currentOrderSize}</div>
+                        <div style="color: #e74c3c; font-weight: bold; font-size: 1.2rem;">₹${currentOrderProduct.price}</div>
+                        <div style="color: #666; font-size: 0.9rem;">${getCategoryName(currentOrderProduct.category)} - ${getTypeName(currentOrderProduct.type)}</div>
+                    </div>
+                </div>
+            `;
+            
+            productSummary.innerHTML = summaryHTML;
+            document.getElementById('quickOrderForm').reset();
+            document.getElementById('quickOrderModal').style.display = 'block';
+        }
+
+        function loadCart() {
+            cart = cart || [];
+        }
+
+        function saveCart() {
+            console.log('Cart saved in memory:', cart.length, 'items');
+        }
+
+        async function applyFilters() {
+            showLoading();
+            
+            const filters = {
+                category: document.getElementById('categoryFilter').value,
+                brand: document.getElementById('brandFilter').value,
+                color: document.getElementById('colorFilter').value,
+                minPrice: parseInt(document.getElementById('minPrice').value) || null,
+                maxPrice: parseInt(document.getElementById('maxPrice').value) || null
+            };
+
+            Object.keys(filters).forEach(key => {
+                if (!filters[key]) delete filters[key];
+            });
+
+            try {
+                if (Object.keys(filters).length > 0 && window.casualDataManager) {
+                    filteredProducts = await window.casualDataManager.getProducts(filters);
+                } else {
+                    filteredProducts = [...products];
+                }
+                
+                const size = document.getElementById('sizeFilter').value;
+                if (size) {
+                    filteredProducts = filteredProducts.filter(product => 
+                        product.sizes && product.sizes.includes(size)
+                    );
+                }
+                
+                displayProducts(filteredProducts);
+                
+            } catch (error) {
+                console.error('Error applying filters:', error);
+                filteredProducts = products.filter(product => {
+                    let matchesCategory = !filters.category || product.category === filters.category;
+                    let matchesBrand = !filters.brand || product.brand === filters.brand;
+                    let matchesColor = !filters.color || product.color === filters.color;
+                    let matchesPrice = (!filters.minPrice || product.price >= filters.minPrice) && 
+                                     (!filters.maxPrice || product.price <= filters.maxPrice);
+                    
+                    const size = document.getElementById('sizeFilter').value;
+                    let matchesSize = !size || (product.sizes && product.sizes.includes(size));
+
+                    return matchesCategory && matchesBrand && matchesColor && matchesSize && matchesPrice;
+                });
+                displayProducts(filteredProducts);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('brandFilter').value = '';
+            document.getElementById('colorFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            
+            loadProducts();
+        }
+
+        function displayProducts(productsToShow) {
+            const productsGrid = document.getElementById('productsGrid');
+            const noProducts = document.getElementById('noProducts');
+            
+            console.log('Displaying products:', productsToShow.length);
+            
+            if (productsToShow.length === 0) {
+                productsGrid.innerHTML = '';
+                noProducts.style.display = 'block';
+                return;
+            }
+            
+            noProducts.style.display = 'none';
+            
+            productsGrid.innerHTML = productsToShow.map(product => {
+                const mainImage = (product.images && product.images.length > 0) ? product.images[0] : null;
+                const hasMultipleImages = product.images && product.images.length > 1;
+                
+                return `
+                <div class="product-card" data-product-id="${product.id}" data-current-image-index="0">
+                    <div class="product-badge">${product.badge || 'NEW'}</div>
+                    <div class="product-images-container" onclick="openProductDetail(${product.id})">
+                        <div class="product-image-main">
+                            ${mainImage && mainImage.startsWith('http') ? 
+                                `<img src="${mainImage}" alt="${product.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${getCategoryIcon(product.category, product.type)}';">` : 
+                                getCategoryIcon(product.category, product.type)
+                            }
+                        </div>
+                        
+                        ${hasMultipleImages ? `
+                            <button class="image-nav prev" onclick="event.stopPropagation(); changeProductImage(${product.id}, -1)">❮</button>
+                            <button class="image-nav next" onclick="event.stopPropagation(); changeProductImage(${product.id}, 1)">❯</button>
+                            
+                            <div class="image-indicators">
+                                ${product.images.map((_, index) => `
+                                    <div class="image-dot ${index === 0 ? 'active' : ''}" onclick="event.stopPropagation(); setProductImage(${product.id}, ${index})"></div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${getCategoryName(product.category)} - कैजुअल</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">
+                            <span class="current-price">₹${product.price}</span>
+                            ${product.discount > 0 ? `
+                                <span class="original-price">₹${product.original_price}</span>
+                                <span class="discount">${product.discount}% OFF</span>
+                            ` : ''}
+                        </div>
+                        <div class="product-sizes">
+                            <span class="sizes-label">उपलब्ध साइज़:</span>
+                            <div class="size-options">
+                                ${(product.sizes || []).map(size => `
+                                    <button class="size-btn" onclick="selectSize(this, '${product.id}', '${size}')">${size}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" onclick="addToCart(${product.id})">
+                                🛒 Cart
+                            </button>
+                            <button class="quick-order" onclick="quickOrderWhatsApp(${product.id})">
+                                📱 Order
+                            </button>
+                            <button class="view-details" onclick="openProductDetail(${product.id})">
+                                👁️ View Detailed
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'mens': 'पुरुष',
+                'womens': 'महिला',
+                'kids': 'बच्चे'
+            };
+            return names[category] || category;
+        }
+
+        function getTypeName(type) {
+            const names = {
+                'formal': 'फॉर्मल',
+                'sports': 'स्पोर्ट्स',
+                'casual': 'कैजुअल'
+            };
+            return names[type] || type;
+        }
+
+        function getCategoryIcon(category, type) {
+            if (category === 'womens') return '👠';
+            if (category === 'kids') return '👟';
+            return '👟';
+        }
+
+        function selectSize(button, productId, size) {
+            const productCard = button.closest('.product-card');
+            productCard.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id == productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            const selectedSize = selectedSizeBtn.textContent;
+            
+            const existingItem = cart.find(item => 
+                item.id == productId && item.selectedSize === selectedSize
+            );
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    selectedSize: selectedSize,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            updateCartDisplay();
+            saveCart();
+            
+            const button = productCard.querySelector('.add-to-cart');
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Added!';
+            button.style.background = '#2ecc71';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#27ae60';
+            }, 2000);
+        }
+
+        function quickOrderWhatsApp(productId) {
+            const product = products.find(p => p.id == productId);
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            const selectedSizeBtn = productCard.querySelector('.size-btn.selected');
+            
+            if (!selectedSizeBtn) {
+                alert('कृपया पहले साइज़ चुनें!');
+                return;
+            }
+            
+            currentOrderProduct = product;
+            currentOrderSize = selectedSizeBtn.textContent;
+            
+            const productSummary = document.getElementById('productSummary');
+            const categoryIcon = getCategoryIcon(product.category, product.type);
+            
+            let summaryHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            `;
+            
+            if (product.images && product.images.length > 0 && product.images[0].startsWith('http')) {
+                summaryHTML += `<img src="${product.images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentNode.innerHTML='${categoryIcon}';">`;
+            } else {
+                summaryHTML += categoryIcon;
+            }
+            
+            summaryHTML += `
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; font-size: 1.1rem;">${product.name}</div>
+                        <div style="color: #666;">Size: ${currentOrderSize}</div>
+                        <div style="color: #e74c3c; font-weight: bold; font-size: 1.2rem;">₹${product.price}</div>
+                        <div style="color: #666; font-size: 0.9rem;">${getCategoryName(product.category)} - ${getTypeName(product.type)}</div>
+                    </div>
+                </div>
+            `;
+            
+            productSummary.innerHTML = summaryHTML;
+            document.getElementById('quickOrderForm').reset();
+            document.getElementById('quickOrderModal').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('customerName').focus();
+            }, 100);
+        }
+
+        function closeQuickOrderModal() {
+            document.getElementById('quickOrderModal').style.display = 'none';
+            currentOrderProduct = null;
+            currentOrderSize = null;
+        }
+
+        function submitQuickOrder() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+            const message = document.getElementById('customerMessage').value.trim();
+            
+            if (!name) {
+                alert('कृपया अपना नाम डालें!');
+                document.getElementById('customerName').focus();
+                return;
+            }
+            
+            if (!phone) {
+                alert('कृपया फोन नंबर डालें!');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
+            
+            if (phone.length < 10) {
+                alert('कृपया सही फोन नंबर डालें!');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
+            
+            if (!address) {
+                alert('कृपया अपना पूरा पता डालें!');
+                document.getElementById('customerAddress').focus();
+                return;
+            }
+            
+            const customerInfo = { name, phone, address, message };
+            const whatsappMessage = createWhatsAppMessage(currentOrderProduct, customerInfo, currentOrderSize);
+            
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappURL, '_blank');
+            
+            closeQuickOrderModal();
+            
+            setTimeout(() => {
+                alert('आपका order WhatsApp पर भेज दिया गया है! जल्द ही आपसे संपर्क किया जाएगा।');
+            }, 500);
+        }
+
+        function openCart() {
+            document.getElementById('cartSidebar').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+            updateCartDisplay();
+        }
+
+        function closeCart() {
+            document.getElementById('cartSidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function closeAllPanels() {
+            closeCart();
+            closeQuickOrderModal();
+            closeProductDetail();
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutSection = document.getElementById('checkoutSection');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '';
+                cartTotal.style.display = 'none';
+                checkoutSection.style.display = 'none';
+                emptyCartMessage.style.display = 'block';
+                return;
+            }
+
+            emptyCartMessage.style.display = 'none';
+            cartTotal.style.display = 'block';
+            checkoutSection.style.display = 'block';
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        ${item.images && item.images.length > 0 && item.images[0].startsWith('http') ? 
+                            `<img src="${item.images[0]}" alt="${item.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${getCategoryIcon(item.category, item.type)}';">` : 
+                            getCategoryIcon(item.category, item.type)
+                        }
+                    </div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-size">Size: ${item.selectedSize}</div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.selectedSize}', -1)">-</button>
+                            <span style="margin: 0 0.5rem;">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${item.id}, '${item.selectedSize}', 1)">+</button>
+                            <button class="qty-btn" onclick="removeFromCart(${item.id}, '${item.selectedSize}')" style="margin-left: 0.5rem; color: #e74c3c;">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="cart-item-price">₹${item.price * item.quantity}</div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('finalTotal').textContent = `₹${subtotal}`;
+        }
+
+        function updateQuantity(productId, selectedSize, change) {
+            const item = cart.find(item => item.id == productId && item.selectedSize === selectedSize);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId, selectedSize);
+                } else {
+                    updateCartCount();
+                    updateCartDisplay();
+                    saveCart();
+                }
+            }
+        }
+
+        function removeFromCart(productId, selectedSize) {
+            cart = cart.filter(item => !(item.id == productId && item.selectedSize === selectedSize));
+            updateCartCount();
+            updateCartDisplay();
+            saveCart();
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Cart empty है!');
+                return;
+            }
+            orderViaWhatsApp();
+        }
+
+        function orderViaWhatsApp() {
+            if (cart.length === 0) {
+                alert('Cart empty है!');
+                return;
+            }
+
+            const message = createCartWhatsAppMessage();
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('productsGrid').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('productsGrid').style.opacity = '1';
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded - Starting initialization...');
+            
+            try {
+                await loadProducts();
+                loadCart();
+                updateCartCount();
+                
+                let ticking = false;
+                window.addEventListener('scroll', function() {
+                    if (!ticking) {
+                        requestAnimationFrame(function() {
+                            handleScroll();
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+                
+                console.log('Initialization complete!');
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
+
+            // Modal click handlers
+            const quickOrderModal = document.getElementById('quickOrderModal');
+            const productDetailModal = document.getElementById('productDetailModal');
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === quickOrderModal) {
+                    closeQuickOrderModal();
+                }
+                if (event.target === productDetailModal) {
+                    closeProductDetail();
+                }
+            });
+
+            // Form enter key handler
+            const form = document.getElementById('quickOrderForm');
+            if (form) {
+                form.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        submitQuickOrder();
+                    }
+                });
+            }
+        });
+
+        console.log('Bayosa Footwear enhanced casual shoes script loaded successfully with 3-image scroll and compact footer!');
+    </script>
+</body>
+</html>
