@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>हमारे बारे में - Bayosa Footwear | झाडोली सिरोही</title>
+    <meta name="description" content="Bayosa Footwear - झाडोली सिरोही की सबसे भरोसेमंद जूतों की दुकान। Quality footwear, free Village delivery, और बेहतरीन customer service।">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff7b7b 0%, #667eea 50%, #f093fb 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-top: 120px;
+            min-height: calc(100vh - 120px);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0.3rem 0;
+        }
+
+        .nav-item {
+            padding: 0.4rem 0.8rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+            flex-shrink: 0;
+            min-width: fit-content;
+            font-size: 0.85rem;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .owner-section {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .owner-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .timeline-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1.5rem 0 1.5rem 3rem;
+            border-left: 3px solid #ff6b6b;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 2rem;
+            width: 14px;
+            height: 14px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #ff6b6b;
+        }
+
+        .timeline-year {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .whatsapp-btn:hover {
+            background: #1ea952;
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .villages-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .villages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .village-item {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: #333;
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .village-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem 0;
+            margin-top: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .back-to-home {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-to-home:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+            color: white;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 100px;
+            }
+
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .hero-section p {
+                font-size: 1rem;
+            }
+
+            .about-card {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .feature-card {
+                padding: 1rem;
+            }
+
+            .owner-section {
+                padding: 1.5rem;
+            }
+
+            .timeline-item {
+                padding-left: 2.5rem;
+            }
+
+            .contact-section {
+                padding: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .villages-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <span class="logo-icon">👞</span>
+                    <h1>Bayosa Footwear</h1>
+                </div>
+                <div class="header-actions">
+                    <div>📍 सिवेरा रोड, झाडोली</div>
+                    <div>📞 +91-90795-69517</div>
+                </div>
+            </div>
+
+            <nav class="navbar">
+                <a href="index.html" class="nav-item">होम</a>
+                <a href="about-us.html" class="nav-item active">हमारे बारे में</a>
+                <a href="mens-shoes.html" class="nav-item">पुरुषों के जूते</a>
+                <a href="womens-shoes.html" class="nav-item">महिलाओं के जूते</a>
+                <a href="kids-shoes.html" class="nav-item">बच्चों के जूते</a>
+                <a href="contact.html" class="nav-item">संपर्क करें</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h1>हमारे बारे में</h1>
+                <p>झाडोली सिरोही की सबसे भरोसेमंद जूतों की दुकान</p>
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem 2rem; border-radius: 25px; display: inline-block; backdrop-filter: blur(5px);">
+                    <strong>2024 से आपकी सेवा में</strong>
+                </div>
+            </section>
+
+            <!-- About Us Card -->
+            <div class="about-card">
+                <h2 class="section-title">Bayosa Footwear की कहानी</h2>
+                <p class="section-subtitle">
+                    हमारी शुरुआत 2024 में झाडोली, सिरोही में एक नए vision के साथ हुई। आज हम पिंडवारा, 
+                    सिरोही और आसपास के 100+ गांवों में quality footwear की home delivery करते हैं।
+                </p>
+
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #ff6b6b; margin: 1.5rem 0;">
+                    <h3 style="color: #333; margin-bottom: 1rem;">हमारा मिशन</h3>
+                    <p style="color: #666; line-height: 1.8;">
+                        हमारा उद्देश्य है कि हर व्यक्ति को अच्छे और आरामदायक जूते मिलें, चाहे वो शहर में हो या गांव में। 
+                        Quality, affordability और customer satisfaction हमारी पहली प्राथमिकता है।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="about-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🚚</span>
+                    <h3 class="feature-title">Free Village Delivery</h3>
+                    <p class="feature-description">
+                        पिंडवारा तहसील के सभी 108 गांवों में फ्री होम डिलीवरी। साथ ही पाली जिले के नाना, मालनू, 
+                        चामुंदेरी और अन्य निकटवर्ती क्षेत्रों में भी। 1-2 दिन में घर तक पहुंचाते हैं।
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">💳</span>
+                    <h3 class="feature-title">Cash on Delivery</h3>
+                    <p class="feature-description">
+                        पहले जूते देखें, फिर पैसे दें। Online payment की भी सुविधा उपलब्ध। 
+                        PhonePe, GPay, Card payment सभी accept करते हैं।
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">👟</span>
+                    <h3 class="feature-title">Quality Products</h3>
+                    <p class="feature-description">
+                        Sparks,Campus,Columbus,Action,Flymax जैसे top brands के original products। 
+                        Size exchange facility और quality guarantee के साथ।
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3 class="feature-title">WhatsApp Ordering</h3>
+                    <p class="feature-description">
+                        WhatsApp पर direct order कर सकते हैं। Product photos, size guide, 
+                        और instant customer support available 24/7।
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">👨‍👩‍👧‍👦</span>
+                    <h3 class="feature-title">Family Store</h3>
+                    <p class="feature-description">
+                        Men's, Women's, Kids के लिए complete collection। Formal, sports, 
+                        casual, wedding shoes - सभी categories available।
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <h3 class="feature-title">Local Focus</h3>
+                    <p class="feature-description">
+                        राजस्थान के rural areas में specialized service। Local needs को 
+                        समझते हैं और accordingly products offer करते हैं।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Owner Section -->
+            <div class="owner-section">
+                <div class="owner-photo">👨‍💼</div>
+                <h2 style="margin-bottom: 1rem;">संस्थापक की बात</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                    "मैंने 2024 में Bayosa Footwear की शुरुआत इस सोच के साथ की थी कि 
+                    हमारे गांव-देहात के लोगों को भी शहर जैसी quality और service मिले। 
+                    एक साल में ही हम 100+ गांवों में service देने लगे हैं।"
+                </p>
+                <p style="font-style: italic; opacity: 0.9;">
+                    - Bayosa Footwear Team
+                </p>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">114+</div>
+                    <div class="stat-label">Villages Covered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Products Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Year Experience</div>
+                </div>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="timeline-section">
+                <h2 class="section-title">हमारी Journey</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">जनवरी 2024</div>
+                        <div class="timeline-title">शुरुआत</div>
+                        <div class="timeline-description">
+                            झाडोली, सिरोही में दुकान की शुरुआत। Local customers के लिए quality shoes provide करने का सपना।
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-year">मार्च 2024</div>
+                        <div class="timeline-title">Brand Partnership</div>
+                        <div class="timeline-description">
+                            Sparks, Campus, Action जैसे top brands के साथ partnership। Product variety बढ़ाई।
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-year">जून 2024</div>
+                        <div class="timeline-title">Home Delivery Start</div>
+                        <div class="timeline-description">
+                            आसपास के गांवों में home delivery service शुरू की। Customer response बहुत positive मिला।
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-year">सितंबर 2024</div>
+                        <div class="timeline-title">Digital Transformation</div>
+                        <div class="timeline-description">
+                            WhatsApp ordering और online payment options add किए। Digital catalog ready किया।
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-year">दिसंबर 2024</div>
+                        <div class="timeline-title">Website Launch</div>
+                        <div class="timeline-description">
+                            bayosafootwear.in website launch किया। Online catalog और order system ready किया।
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-year">जनवरी 2025</div>
+                        <div class="timeline-title">100+ Villages Coverage</div>
+                        <div class="timeline-description">
+                            Service को 114+ गांवों तक बढ़ाया। पिंडवारा तहसील के सभी गांवों के साथ-साथ पाली और उदयपुर के कुछ हिस्सों में भी delivery शुरू की।
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Villages Section -->
+            <div class="villages-section">
+                <h2 class="section-title">हमारे Service Areas - सभी 114+ गांव</h2>
+                <p class="section-subtitle">
+                    हम निम्नलिखित सभी गांवों और कस्बों में FREE Village DELIVERY करते हैं:
+                </p>
+                
+                <h3 style="color: #ff6b6b; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">पिंडवारा तहसील के 108 गांव:</h3>
+                <div class="villages-grid">
+                    <div class="village-item">अचपुरा</div>
+                    <div class="village-item">आदर्श</div>
+                    <div class="village-item">अजारी</div>
+                    <div class="village-item">अमली</div>
+                    <div class="village-item">अप्री खेड़ा</div>
+                    <div class="village-item">अरसाना</div>
+                    <div class="village-item">बानास</div>
+                    <div class="village-item">बसंतगढ़</div>
+                    <div class="village-item">भदावेरी</div>
+                    <div class="village-item">भरजा</div>
+                    <div class="village-item">भिमाना</div>
+                    <div class="village-item">भूजेला</div>
+                    <div class="village-item">भोला</div>
+                    <div class="village-item">बिलार</div>
+                    <div class="village-item">ब्लॉक नंबर 2</div>
+                    <div class="village-item">बोर उमरी</div>
+                    <div class="village-item">चावर्ली</div>
+                    <div class="village-item">चीनिया बंध</div>
+                    <div class="village-item">चुर्लीखेड़ा</div>
+                    <div class="village-item">धनाड़ी</div>
+                    <div class="village-item">धंधपुरा</div>
+                    <div class="village-item">धांगा</div>
+                    <div class="village-item">दिगर</div>
+                    <div class="village-item">डूंगरी</div>
+                    <div class="village-item">इसाऊ</div>
+                    <div class="village-item">गाडिया</div>
+                    <div class="village-item">घरात</div>
+                    <div class="village-item">घोड़ियावा</div>
+                    <div class="village-item">गोलिया</div>
+                    <div class="village-item">इसरा</div>
+                    <div class="village-item">जनापुर</div>
+                    <div class="village-item">झाडोली</div>
+                    <div class="village-item">झांकर</div>
+                    <div class="village-item">जियापुरा</div>
+                    <div class="village-item">जुनासंवारा</div>
+                    <div class="village-item">कच्छोली</div>
+                    <div class="village-item">कलाबोर</div>
+                    <div class="village-item">कलुम्बारी</div>
+                    <div class="village-item">कान्तल</div>
+                    <div class="village-item">कसींद्रा</div>
+                    <div class="village-item">केदार पादर</div>
+                    <div class="village-item">केर</div>
+                    <div class="village-item">केरलापादर</div>
+                    <div class="village-item">केशवगंज</div>
+                    <div class="village-item">खाकरवाड़ा</div>
+                    <div class="village-item">खारी गेगरवा</div>
+                    <div class="village-item">खोखरी खेड़ा</div>
+                    <div class="village-item">कोदरला</div>
+                    <div class="village-item">कोजरा</div>
+                    <div class="village-item">कोत्रा</div>
+                    <div class="village-item">कुंडल</div>
+                    <div class="village-item">लोटाना</div>
+                    <div class="village-item">मलाप</div>
+                    <div class="village-item">मलेड़ा</div>
+                    <div class="village-item">मंडवारा देव</div>
+                    <div class="village-item">मंडवारा खालसा</div>
+                    <div class="village-item">मोरास</div>
+                    <div class="village-item">मुरी</div>
+                    <div class="village-item">नागपुरा</div>
+                    <div class="village-item">नई धनाड़ी</div>
+                    <div class="village-item">नई जमीन</div>
+                    <div class="village-item">नानरवाड़ा</div>
+                    <div class="village-item">नंदिया</div>
+                    <div class="village-item">नवावास</div>
+                    <div class="village-item">नवावास देव</div>
+                    <div class="village-item">नवावासा खालसा</div>
+                    <div class="village-item">नया संवारा</div>
+                    <div class="village-item">नितौरा</div>
+                    <div class="village-item">पहाड़ कलां</div>
+                    <div class="village-item">पंचदेवल</div>
+                    <div class="village-item">परलई</div>
+                    <div class="village-item">पतुम्बुरी</div>
+                    <div class="village-item">पीतारी पादर</div>
+                    <div class="village-item">पेशुआ</div>
+                    <div class="village-item">फूला बाई का खेड़ा</div>
+                    <div class="village-item">फुलेड़ा</div>
+                    <div class="village-item">पिंडवारा (ग्रामीण)</div>
+                    <div class="village-item">पीपला</div>
+                    <div class="village-item">राजपुरा</div>
+                    <div class="village-item">रामपुरा</div>
+                    <div class="village-item">रीछड़ी</div>
+                    <div class="village-item">रोहिड़ा</div>
+                    <div class="village-item">सबेला</div>
+                    <div class="village-item">सादलवा</div>
+                    <div class="village-item">सादाफली</div>
+                    <div class="village-item">संगवारा</div>
+                    <div class="village-item">संवारा</div>
+                    <div class="village-item">सेमली</div>
+                    <div class="village-item">शिवगढ़</div>
+                    <div class="village-item">सिलवानी</div>
+                    <div class="village-item">सिवेड़ा</div>
+                    <div class="village-item">तरूंगी</div>
+                    <div class="village-item">तेलपुर</div>
+                    <div class="village-item">थांडी बेरी</div>
+                    <div class="village-item">उबेड़ा</div>
+                    <div class="village-item">उदवरिया</div>
+                    <div class="village-item">उन्द्रा</div>
+                    <div class="village-item">वगदारी</div>
+                    <div class="village-item">वड़की खेड़ा</div>
+                    <div class="village-item">वड़ली</div>
+                    <div class="village-item">वतेड़ा</div>
+                    <div class="village-item">वीरवारा</div>
+                    <div class="village-item">वीरोली</div>
+                    <div class="village-item">वलोरिया</div>
+                    <div class="village-item">वाड़ा</div>
+                    <div class="village-item">वासा</div>
+                </div>
+
+                <h3 style="color: #4ecdc4; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">मुख्य शहर:</h3>
+                <div class="villages-grid">
+                    <div class="village-item" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);">पिंडवारा (मुख्य शहर)</div>
+                    <div class="village-item" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);">सिरोही (जिला मुख्यालय)</div>
+                </div>
+
+                <h3 style="color: #ff6b6b; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">पाली जिले के निकटवर्ती गांव:</h3>
+                <div class="villages-grid">
+                    <div class="village-item">नाना</div>
+                    <div class="village-item">मालनू</div>
+                    <div class="village-item">चामुंदेरी</div>
+                    <div class="village-item">लालपुरा</div>
+                    <div class="village-item">लुंडारा</div>
+                    <div class="village-item">चिमनपुरा</div>
+                </div>
+
+                <h3 style="color: #667eea; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">अन्य निकटवर्ती कस्बे/शहर:</h3>
+                <div class="villages-grid">
+                    <div class="village-item">शिवगंज</div>
+                    <div class="village-item">अबू रोड</div>
+                    <div class="village-item">माउंट अबू</div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #ff9a9e, #fecfef); padding: 1.5rem; border-radius: 10px; margin-top: 2rem; text-align: center;">
+                    <h4 style="color: #333; margin-bottom: 1rem;">📍 Total Coverage Area</h4>
+                    <p style="color: #666; font-size: 1.1rem; font-weight: 500;">
+                        <strong>114+ गांव और शहर में FREE Village DELIVERY</strong><br>
+                        पिंडवारा से 25 किमी के दायरे में सभी जगह सेवा उपलब्ध
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-section">
+                <h2 style="margin-bottom: 1rem;">आज ही संपर्क करें!</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; opacity: 0.9;">
+                    Quality footwear के लिए हमसे बात करें। WhatsApp, call या website से order कर सकते हैं।
+                </p>
+
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <h4>दुकान का पता</h4>
+                        <p>सिवेरा रोड, झाडोली<br>सिरोही, राजस्थान</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <h4>फोन नंबर</h4>
+                        <p>+91-90795-69517<br>सुबह 9:00 - रात 9:00</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <span class="contact-icon">🌐</span>
+                        <h4>Service Area</h4>
+                        <p>पिंडवारा तहसील के सभी 108 गांव<br>+ पाली जिले के निकटवर्ती गांव<br>कुल 114+ locations</p>
+                    </div>
+                </div>
+
+                <a href="https://wa.me/919079569517?text=नमस्ते! मुझे Bayosa Footwear के बारे में जानकारी चाहिए।" 
+                   target="_blank" class="whatsapp-btn">
+                    📱 WhatsApp पर बात करें
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h4>संपर्क जानकारी</h4>
+                    <p>📍 सिवेरा रोड, झाडोली</p>
+                    <p>📞 +91-90795-69517</p>
+                    <p>⏰ सुबह 9:00 - रात 9:00</p>
+                    <p>🌐 7 दिन खुला</p>
+                </div>
+                <div>
+                    <h4>हमारी सेवाएं</h4>
+                    <p>• Free Village Delivery</p>
+                    <p>• Cash on Delivery</p>
+                    <p>• Online Payment</p>
+                    <p>• Size Exchange</p>
+                    <p>• Quality Guarantee</p>
+                </div>
+                <div>
+                    <h4>Service Areas</h4>
+                    <p>• पिंडवारा तहसील के सभी 108 गांव</p>
+                    <p>• सिरोही जिला</p>
+                    <p>• पाली जिले के निकटवर्ती गांव</p>
+                    <p>• उदयपुर के कुछ हिस्से</p>
+                    <p>• कुल 114+ locations</p>
+                </div>
+                <div>
+                    <h4>Quick Links</h4>
+                    <p><a href="index.html" style="color: #ff6b6b; text-decoration: none;">🏠 होम</a></p>
+                    <p><a href="mens-shoes.html" style="color: #ff6b6b; text-decoration: none;">👨 Men's Shoes</a></p>
+                    <p><a href="womens-shoes.html" style="color: #ff6b6b; text-decoration: none;">👩 Women's Shoes</a></p>
+                    <p><a href="kids-shoes.html" style="color: #ff6b6b; text-decoration: none;">👶 Kids Shoes</a></p>
+                    <p><a href="contact.html" style="color: #ff6b6b; text-decoration: none;">📞 Contact</a></p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                <p>&copy; 2024 Bayosa Footwear - सभी अधिकार सुरक्षित</p>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                    झाडोली सिरोही की सबसे भरोसेमंद जूतों की दुकान - 2024 से सेवा में
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Home Button -->
+    <a href="index.html" class="back-to-home" title="होम पर वापस जाएं">
+        🏠
+    </a>
+
+    <script>
+        // Smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        let lastScrollTop = 0;
+        const header = document.querySelector('.header');
+
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+
+        // Add loading animation to village items
+        document.addEventListener('DOMContentLoaded', function() {
+            const villageItems = document.querySelectorAll('.village-item');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 50);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            villageItems.forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'all 0.6s ease';
+                observer.observe(item);
+            });
+
+            // Also animate other cards
+            const cards = document.querySelectorAll('.feature-card, .stat-card');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+
+        // Add some interactive effects to village items
+        document.querySelectorAll('.village-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) rotate(1deg)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    </script>
+</body>
+</html>
